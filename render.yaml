@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: jotto-duel
+    env: docker
+    autoDeploy: true
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: JOTTO_DB_PATH
+        value: /var/data/jotto.db
+    disk:
+      name: jotto-data
+      mountPath: /var/data
+      sizeGB: 1
