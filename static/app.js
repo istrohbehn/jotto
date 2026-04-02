@@ -1,17 +1,23 @@
+const params = new URLSearchParams(window.location.search);
+
 const state = {
   bootstrap: null,
-  roomCode: new URLSearchParams(window.location.search).get("room")?.toUpperCase() || "",
+  roomCode: params.get("room")?.toUpperCase() || "",
+  currentView: params.get("view") === "game" ? "game" : "lobby",
   pollHandle: null,
 };
 
 const els = {
   authPanel: document.getElementById("authPanel"),
   dashboard: document.getElementById("dashboard"),
+  lobbyView: document.getElementById("lobbyView"),
+  gameView: document.getElementById("gameView"),
   usernameInput: document.getElementById("usernameInput"),
   passwordInput: document.getElementById("passwordInput"),
   signupBtn: document.getElementById("signupBtn"),
   loginBtn: document.getElementById("loginBtn"),
   meLabel: document.getElementById("meLabel"),
+  navLobbyBtn: document.getElementById("navLobbyBtn"),
   createPrivateBtn: document.getElementById("createPrivateBtn"),
   findMatchBtn: document.getElementById("findMatchBtn"),
   logoutBtn: document.getElementById("logoutBtn"),
@@ -76,6 +82,7 @@ function setBusy(isBusy) {
   [
     els.signupBtn,
     els.loginBtn,
+    els.navLobbyBtn,
     els.createPrivateBtn,
     els.findMatchBtn,
     els.logoutBtn,
@@ -92,15 +99,31 @@ function setBusy(isBusy) {
   });
 }
 
-function setRoomCode(roomCode) {
-  state.roomCode = roomCode ? roomCode.toUpperCase() : "";
+function syncUrl() {
   const url = new URL(window.location.href);
   if (state.roomCode) {
     url.searchParams.set("room", state.roomCode);
   } else {
     url.searchParams.delete("room");
   }
+  if (state.currentView === "game" && state.roomCode) {
+    url.searchParams.set("view", "game");
+  } else {
+    url.searchParams.delete("view");
+  }
   window.history.replaceState({}, "", url);
+}
+
+function goToLobby() {
+  state.currentView = "lobby";
+  syncUrl();
+  render();
+}
+
+function goToGame(roomCode) {
+  state.roomCode = roomCode ? roomCode.toUpperCase() : "";
+  state.currentView = state.roomCode ? "game" : "lobby";
+  syncUrl();
 }
 
 function renderRooms(rooms) {
@@ -122,9 +145,9 @@ function renderRooms(rooms) {
         <span>Round ${room.round_number}</span>
       </div>
     `;
-    card.addEventListener("click", () => {
-      setRoomCode(room.room_code);
-      refresh();
+    card.addEventListener("click", async () => {
+      goToGame(room.room_code);
+      await refresh();
     });
     els.roomsList.appendChild(card);
   }
@@ -194,12 +217,12 @@ function renderInvite(invite, user) {
 }
 
 function renderRoom(room) {
-  const visible = Boolean(room);
-  els.gamePanel.classList.toggle("hidden", !visible);
-  if (!visible) {
+  if (!room) {
+    els.gamePanel.classList.add("hidden");
     return;
   }
 
+  els.gamePanel.classList.remove("hidden");
   renderPlayers(room.players);
   renderGuesses(room.guesses);
   renderHistory(room.round_history);
@@ -231,10 +254,22 @@ function renderRoom(room) {
   els.restartBtn.classList.toggle("hidden", !(room.status === "finished" && room.can_restart));
 }
 
+function renderViews(user, room) {
+  const showGame = Boolean(user && state.currentView === "game" && state.roomCode);
+  els.navLobbyBtn.classList.toggle("hidden", !showGame);
+  els.lobbyView.classList.toggle("hidden", showGame);
+  els.gameView.classList.toggle("hidden", !showGame);
+
+  if (showGame && !room) {
+    els.gamePanel.classList.add("hidden");
+  }
+}
+
 function render() {
   const data = state.bootstrap || {};
   const user = data.user;
   const lobby = data.lobby;
+  const room = data.room;
 
   els.authPanel.classList.toggle("hidden", Boolean(user));
   els.dashboard.classList.toggle("hidden", !user);
@@ -242,7 +277,7 @@ function render() {
 
   if (!user) {
     renderInvite(data.invite, user);
-    renderRoom(null);
+    renderViews(null, null);
     return;
   }
 
@@ -253,13 +288,18 @@ function render() {
   els.waitingPublicLabel.textContent = String(lobby?.public_waiting_count || 0);
   renderRooms(lobby?.rooms || []);
   renderInvite(data.invite, user);
-  renderRoom(data.room);
+  renderViews(user, room);
+  renderRoom(room);
 }
 
 async function refresh() {
   try {
     const roomQuery = state.roomCode ? `?room=${encodeURIComponent(state.roomCode)}` : "";
     state.bootstrap = await api(`/api/bootstrap${roomQuery}`);
+    if (state.currentView === "game" && state.roomCode && !state.bootstrap.room) {
+      state.currentView = "lobby";
+      syncUrl();
+    }
     render();
   } catch (error) {
     showToast(error.message);
@@ -299,7 +339,7 @@ async function createPrivateRoom() {
   setBusy(true);
   try {
     const data = await api("/api/private-room", { method: "POST", body: "{}" });
-    setRoomCode(data.room_code);
+    goToGame(data.room_code);
     await refresh();
   } catch (error) {
     showToast(error.message);
@@ -312,7 +352,7 @@ async function findMatch() {
   setBusy(true);
   try {
     const data = await api("/api/matchmaking", { method: "POST", body: "{}" });
-    setRoomCode(data.room_code);
+    goToGame(data.room_code);
     await refresh();
   } catch (error) {
     showToast(error.message);
@@ -334,8 +374,8 @@ async function joinRoom(roomCode) {
       method: "POST",
       body: JSON.stringify({ room_code: normalized }),
     });
-    setRoomCode(data.room_code);
     els.joinCodeInput.value = "";
+    goToGame(data.room_code);
     await refresh();
   } catch (error) {
     showToast(error.message);
@@ -408,7 +448,9 @@ async function logout() {
   setBusy(true);
   try {
     await api("/api/logout", { method: "POST", body: "{}" });
-    setRoomCode("");
+    state.roomCode = "";
+    state.currentView = "lobby";
+    syncUrl();
     state.bootstrap = null;
     render();
   } catch (error) {
@@ -419,18 +461,20 @@ async function logout() {
 }
 
 async function copyInviteLink() {
-  const link = `${window.location.origin}/?room=${state.roomCode}`;
+  const url = new URL(window.location.origin);
+  url.searchParams.set("room", state.roomCode);
   try {
-    await navigator.clipboard.writeText(link);
+    await navigator.clipboard.writeText(url.toString());
     showToast("Invite link copied.");
   } catch (_error) {
-    showToast(link);
+    showToast(url.toString());
   }
 }
 
 function bindEvents() {
   els.signupBtn.addEventListener("click", () => auth("/api/signup"));
   els.loginBtn.addEventListener("click", () => auth("/api/login"));
+  els.navLobbyBtn.addEventListener("click", goToLobby);
   els.createPrivateBtn.addEventListener("click", createPrivateRoom);
   els.findMatchBtn.addEventListener("click", findMatch);
   els.logoutBtn.addEventListener("click", logout);
@@ -444,6 +488,7 @@ function bindEvents() {
 
 async function boot() {
   bindEvents();
+  syncUrl();
   await refresh();
   startPolling();
 }

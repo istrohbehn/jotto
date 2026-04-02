@@ -9,11 +9,9 @@
   <body>
     <main class="shell">
       <section class="hero">
-        <p class="eyebrow">Accounts, Matchmaking, Persistent Rounds</p>
-        <h1>Jotto Duel</h1>
-        <p class="lede">
-          Create an account, spin up a private room for friends, or jump into public matchmaking for a fast head-to-head Jotto game.
-        </p>
+        <p class="eyebrow">Jotto Duel</p>
+        <h1>Clean 1v1 Wordplay</h1>
+        <p class="lede">Create a room, send the invite, and keep the live match on its own page while the lobby stays your home base.</p>
       </section>
 
       <section id="authPanel" class="panel auth-panel">
@@ -38,12 +36,13 @@
       </section>
 
       <section id="dashboard" class="hidden">
-        <section class="panel dashboard-header">
+        <section class="panel topbar">
           <div>
             <p class="mini-label">Signed In As</p>
             <h2 id="meLabel">Player</h2>
           </div>
           <div class="header-actions">
+            <button id="navLobbyBtn" class="ghost hidden">Back To Lobby</button>
             <button id="createPrivateBtn" class="primary">Create Private Room</button>
             <button id="findMatchBtn" class="secondary">Find Public Match</button>
             <button id="logoutBtn" class="ghost">Log Out</button>
@@ -61,134 +60,141 @@
           <p id="inviteText" class="hint"></p>
         </section>
 
-        <section class="dashboard-grid">
-          <section class="panel">
-            <h3>Lobby</h3>
-            <div class="stats-grid">
-              <article class="stat-card">
-                <span class="mini-label">Wins</span>
-                <strong id="winsLabel">0</strong>
-              </article>
-              <article class="stat-card">
-                <span class="mini-label">Losses</span>
-                <strong id="lossesLabel">0</strong>
-              </article>
-              <article class="stat-card">
-                <span class="mini-label">Finished</span>
-                <strong id="finishedLabel">0</strong>
-              </article>
-              <article class="stat-card">
-                <span class="mini-label">Waiting Public Rooms</span>
-                <strong id="waitingPublicLabel">0</strong>
-              </article>
-            </div>
+        <section id="lobbyView" class="view">
+          <div class="dashboard-grid">
+            <section class="panel">
+              <div class="section-heading">
+                <h3>Lobby</h3>
+                <p class="hint" id="dictionaryCount">0 playable words loaded</p>
+              </div>
+              <div class="stats-grid">
+                <article class="stat-card">
+                  <span class="mini-label">Wins</span>
+                  <strong id="winsLabel">0</strong>
+                </article>
+                <article class="stat-card">
+                  <span class="mini-label">Losses</span>
+                  <strong id="lossesLabel">0</strong>
+                </article>
+                <article class="stat-card">
+                  <span class="mini-label">Finished</span>
+                  <strong id="finishedLabel">0</strong>
+                </article>
+                <article class="stat-card">
+                  <span class="mini-label">Waiting Public Rooms</span>
+                  <strong id="waitingPublicLabel">0</strong>
+                </article>
+              </div>
 
-            <div class="join-strip">
-              <label class="field grow">
-                <span>Join by room code</span>
-                <input id="joinCodeInput" maxlength="6" placeholder="ABC123" />
-              </label>
-              <button id="joinCodeBtn" class="secondary align-end">Join</button>
-            </div>
-          </section>
+              <div class="join-strip">
+                <label class="field grow">
+                  <span>Join by room code</span>
+                  <input id="joinCodeInput" maxlength="6" placeholder="ABC123" />
+                </label>
+                <button id="joinCodeBtn" class="secondary align-end">Join</button>
+              </div>
+            </section>
 
-          <section class="panel">
-            <div class="section-heading">
-              <h3>Recent Rooms</h3>
-              <p class="hint" id="dictionaryCount">0 playable words loaded</p>
-            </div>
-            <div id="roomsEmpty" class="empty-state">Your room list will show up here after you play.</div>
-            <div id="roomsList" class="rooms-list"></div>
-          </section>
+            <section class="panel">
+              <div class="section-heading">
+                <h3>Recent Rooms</h3>
+                <p class="hint">Open any room on its own page.</p>
+              </div>
+              <div id="roomsEmpty" class="empty-state">Your room list will show up here after you play.</div>
+              <div id="roomsList" class="rooms-list"></div>
+            </section>
+          </div>
         </section>
 
-        <section id="gamePanel" class="panel game-panel hidden">
-          <div class="game-header">
+        <section id="gameView" class="view hidden">
+          <section class="panel game-page-header">
             <div>
-              <p class="mini-label">Current Room</p>
+              <p class="mini-label">Current Game</p>
               <h2 id="roomCodeLabel">------</h2>
             </div>
             <div class="header-actions">
               <button id="copyLinkBtn" class="ghost">Copy Invite Link</button>
               <button id="restartBtn" class="secondary hidden">Start New Round</button>
             </div>
-          </div>
-
-          <div class="status-grid">
-            <article class="status-card">
-              <span class="mini-label">Status</span>
-              <strong id="statusText">Waiting</strong>
-            </article>
-            <article class="status-card">
-              <span class="mini-label">Turn</span>
-              <strong id="turnText">-</strong>
-            </article>
-            <article class="status-card">
-              <span class="mini-label">Round</span>
-              <strong id="roundText">1</strong>
-            </article>
-            <article class="status-card">
-              <span class="mini-label">Opponent</span>
-              <strong id="opponentText">-</strong>
-            </article>
-          </div>
-
-          <div class="board">
-            <section class="subpanel">
-              <h3>Players</h3>
-              <ul id="playersList" class="players-list"></ul>
-            </section>
-
-            <section class="subpanel">
-              <h3>Secret Word</h3>
-              <div class="row tight">
-                <label class="field grow">
-                  <span>Choose a 5-letter isogram</span>
-                  <input id="secretInput" maxlength="5" placeholder="crown" />
-                </label>
-                <button id="secretBtn" class="primary align-end">Lock Secret</button>
-              </div>
-              <p class="hint">No repeated letters. The app validates against a larger built-in dictionary.</p>
-            </section>
-
-            <section class="subpanel">
-              <h3>Guess Board</h3>
-              <div class="row tight">
-                <label class="field grow">
-                  <span>Guess</span>
-                  <input id="guessInput" maxlength="5" placeholder="flame" />
-                </label>
-                <button id="guessBtn" class="primary align-end">Submit Guess</button>
-              </div>
-              <p class="hint">Duplicate guesses in the same round are blocked.</p>
-            </section>
-          </div>
-
-          <section class="subpanel">
-            <div class="section-heading">
-              <h3>Round Guess History</h3>
-              <p class="hint">Score = number of shared letters with the opponent’s secret word.</p>
-            </div>
-            <div id="guessesEmpty" class="empty-state">No guesses in this round yet.</div>
-            <table id="guessesTable" class="guesses-table hidden">
-              <thead>
-                <tr>
-                  <th>Player</th>
-                  <th>Guess</th>
-                  <th>Score</th>
-                </tr>
-              </thead>
-              <tbody id="guessesBody"></tbody>
-            </table>
           </section>
 
-          <section class="subpanel">
-            <div class="section-heading">
-              <h3>Recent Rounds</h3>
-              <p class="hint">Finished rounds stay attached to the room so games can be resumed later.</p>
+          <section id="gamePanel" class="game-panel">
+            <div class="status-grid">
+              <article class="status-card">
+                <span class="mini-label">Status</span>
+                <strong id="statusText">Waiting</strong>
+              </article>
+              <article class="status-card">
+                <span class="mini-label">Turn</span>
+                <strong id="turnText">-</strong>
+              </article>
+              <article class="status-card">
+                <span class="mini-label">Round</span>
+                <strong id="roundText">1</strong>
+              </article>
+              <article class="status-card">
+                <span class="mini-label">Opponent</span>
+                <strong id="opponentText">-</strong>
+              </article>
             </div>
-            <div id="historyEmpty" class="empty-state">Round history will appear after you finish a round.</div>
-            <div id="historyList" class="history-list"></div>
+
+            <div class="board">
+              <section class="panel">
+                <h3>Players</h3>
+                <ul id="playersList" class="players-list"></ul>
+              </section>
+
+              <section class="panel">
+                <h3>Secret Word</h3>
+                <div class="stack">
+                  <label class="field">
+                    <span>Choose a 5-letter isogram</span>
+                    <input id="secretInput" maxlength="5" placeholder="black" />
+                  </label>
+                  <button id="secretBtn" class="primary">Lock Secret</button>
+                </div>
+                <p class="hint">No repeated letters. Your secret stays hidden from the other player.</p>
+              </section>
+
+              <section class="panel">
+                <h3>Guess</h3>
+                <div class="stack">
+                  <label class="field">
+                    <span>Enter your guess</span>
+                    <input id="guessInput" maxlength="5" placeholder="flags" />
+                  </label>
+                  <button id="guessBtn" class="primary">Submit Guess</button>
+                </div>
+                <p class="hint">Duplicate guesses in the same round are blocked.</p>
+              </section>
+            </div>
+
+            <section class="panel">
+              <div class="section-heading">
+                <h3>Round Guess History</h3>
+                <p class="hint">Score = number of shared letters with the opponent’s secret word.</p>
+              </div>
+              <div id="guessesEmpty" class="empty-state">No guesses in this round yet.</div>
+              <table id="guessesTable" class="guesses-table hidden">
+                <thead>
+                  <tr>
+                    <th>Player</th>
+                    <th>Guess</th>
+                    <th>Score</th>
+                  </tr>
+                </thead>
+                <tbody id="guessesBody"></tbody>
+              </table>
+            </section>
+
+            <section class="panel">
+              <div class="section-heading">
+                <h3>Recent Rounds</h3>
+                <p class="hint">Finished rounds stay attached to the room so you can revisit them later.</p>
+              </div>
+              <div id="historyEmpty" class="empty-state">Round history will appear after you finish a round.</div>
+              <div id="historyList" class="history-list"></div>
+            </section>
           </section>
         </section>
       </section>
