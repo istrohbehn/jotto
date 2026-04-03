@@ -5,6 +5,7 @@ const state = {
   roomCode: params.get("room")?.toUpperCase() || "",
   currentView: params.get("view") === "game" ? "game" : "lobby",
   pollHandle: null,
+  alphabetMarks: {},
 };
 
 const els = {
@@ -45,8 +46,11 @@ const els = {
   playersList: document.getElementById("playersList"),
   secretInput: document.getElementById("secretInput"),
   secretBtn: document.getElementById("secretBtn"),
+  secretWordDisplay: document.getElementById("secretWordDisplay"),
   guessInput: document.getElementById("guessInput"),
   guessBtn: document.getElementById("guessBtn"),
+  alphabetTracker: document.getElementById("alphabetTracker"),
+  clearAlphabetBtn: document.getElementById("clearAlphabetBtn"),
   guessesEmpty: document.getElementById("guessesEmpty"),
   guessesTable: document.getElementById("guessesTable"),
   guessesBody: document.getElementById("guessesBody"),
@@ -114,6 +118,31 @@ function syncUrl() {
   window.history.replaceState({}, "", url);
 }
 
+function alphabetStorageKey() {
+  return state.roomCode ? `jotto-alphabet-${state.roomCode}` : "";
+}
+
+function loadAlphabetMarks() {
+  const key = alphabetStorageKey();
+  if (!key) {
+    state.alphabetMarks = {};
+    return;
+  }
+  try {
+    state.alphabetMarks = JSON.parse(localStorage.getItem(key) || "{}");
+  } catch (_error) {
+    state.alphabetMarks = {};
+  }
+}
+
+function saveAlphabetMarks() {
+  const key = alphabetStorageKey();
+  if (!key) {
+    return;
+  }
+  localStorage.setItem(key, JSON.stringify(state.alphabetMarks));
+}
+
 function goToLobby() {
   state.currentView = "lobby";
   syncUrl();
@@ -123,7 +152,37 @@ function goToLobby() {
 function goToGame(roomCode) {
   state.roomCode = roomCode ? roomCode.toUpperCase() : "";
   state.currentView = state.roomCode ? "game" : "lobby";
+  loadAlphabetMarks();
   syncUrl();
+}
+
+function cycleLetterState(letter) {
+  const current = state.alphabetMarks[letter] || "clear";
+  const next = current === "clear" ? "present" : current === "present" ? "absent" : "clear";
+  if (next === "clear") {
+    delete state.alphabetMarks[letter];
+  } else {
+    state.alphabetMarks[letter] = next;
+  }
+  saveAlphabetMarks();
+  renderAlphabetTracker();
+}
+
+function renderAlphabetTracker() {
+  if (!els.alphabetTracker) {
+    return;
+  }
+  els.alphabetTracker.innerHTML = "";
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  for (const letter of letters) {
+    const button = document.createElement("button");
+    const mark = state.alphabetMarks[letter] || "clear";
+    button.type = "button";
+    button.className = `alphabet-letter ${mark}`;
+    button.textContent = letter;
+    button.addEventListener("click", () => cycleLetterState(letter));
+    els.alphabetTracker.appendChild(button);
+  }
 }
 
 function renderRooms(rooms) {
@@ -230,6 +289,7 @@ function renderRoom(room) {
   els.roomCodeLabel.textContent = room.room_code;
   els.roundText.textContent = String(room.round_number);
   els.opponentText.textContent = room.opponent_name || "Waiting";
+  els.secretWordDisplay.textContent = room.my_secret_word ? room.my_secret_word.toUpperCase() : "Not set";
 
   let statusMessage = "Waiting for a second player.";
   let turnMessage = "-";
@@ -252,6 +312,7 @@ function renderRoom(room) {
   els.guessInput.disabled = !(room.status === "playing" && room.is_your_turn);
   els.guessBtn.disabled = !(room.status === "playing" && room.is_your_turn);
   els.restartBtn.classList.toggle("hidden", !(room.status === "finished" && room.can_restart));
+  renderAlphabetTracker();
 }
 
 function renderViews(user, room) {
@@ -450,6 +511,7 @@ async function logout() {
     await api("/api/logout", { method: "POST", body: "{}" });
     state.roomCode = "";
     state.currentView = "lobby";
+    state.alphabetMarks = {};
     syncUrl();
     state.bootstrap = null;
     render();
@@ -484,10 +546,16 @@ function bindEvents() {
   els.guessBtn.addEventListener("click", submitGuess);
   els.restartBtn.addEventListener("click", restartRoom);
   els.copyLinkBtn.addEventListener("click", copyInviteLink);
+  els.clearAlphabetBtn.addEventListener("click", () => {
+    state.alphabetMarks = {};
+    saveAlphabetMarks();
+    renderAlphabetTracker();
+  });
 }
 
 async function boot() {
   bindEvents();
+  loadAlphabetMarks();
   syncUrl();
   await refresh();
   startPolling();

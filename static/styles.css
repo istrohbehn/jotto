@@ -30,22 +30,14 @@ body {
 }
 
 .hero {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
-.eyebrow,
 .mini-label,
 .hint,
 .room-meta,
 .empty-state {
   color: var(--muted);
-}
-
-.eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 0.75rem;
-  margin: 0 0 10px;
 }
 
 h1,
@@ -56,7 +48,7 @@ p {
 }
 
 h1 {
-  font-size: clamp(2.6rem, 6vw, 4.6rem);
+  font-size: clamp(2.5rem, 5vw, 4rem);
   line-height: 0.95;
 }
 
@@ -66,13 +58,6 @@ h2 {
 
 h3 {
   font-size: 1.15rem;
-}
-
-.lede {
-  width: min(720px, 100%);
-  margin-top: 14px;
-  color: var(--muted);
-  line-height: 1.5;
 }
 
 .panel,
@@ -198,6 +183,17 @@ button:disabled {
   gap: 14px;
 }
 
+.topbar {
+  justify-content: space-between;
+}
+
+.account-chip {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  text-align: right;
+}
+
 .stat-card,
 .status-card,
 .history-card {
@@ -267,6 +263,44 @@ button:disabled {
   font-size: 0.8rem;
 }
 
+.secret-reminder {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel-alt);
+}
+
+.secret-reminder strong {
+  display: block;
+  margin-top: 6px;
+  letter-spacing: 0.08em;
+}
+
+.alphabet-tracker {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(13, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.alphabet-letter {
+  padding: 10px 0;
+  background: var(--panel-alt);
+  color: var(--text);
+}
+
+.alphabet-letter.present {
+  border-color: #ffffff;
+  background: #111111;
+  border-radius: 999px;
+}
+
+.alphabet-letter.absent {
+  color: #7f7f7f;
+  text-decoration: line-through;
+}
+
 .guesses-table {
   width: 100%;
   border-collapse: collapse;
@@ -299,7 +333,8 @@ button:disabled {
   .dashboard-grid,
   .status-grid,
   .stats-grid,
-  .board {
+  .board,
+  .alphabet-tracker {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -330,7 +365,16 @@ button:disabled {
     align-items: stretch;
   }
 
+  .account-chip {
+    justify-items: start;
+    text-align: left;
+  }
+
   .room-meta {
     text-align: left;
+  }
+
+  .alphabet-tracker {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 }

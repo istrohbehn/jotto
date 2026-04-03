@@ -9,9 +9,7 @@
   <body>
     <main class="shell">
       <section class="hero">
-        <p class="eyebrow">Jotto Duel</p>
-        <h1>Clean 1v1 Wordplay</h1>
-        <p class="lede">Create a room, send the invite, and keep the live match on its own page while the lobby stays your home base.</p>
+        <h1>Jotto</h1>
       </section>
 
       <section id="authPanel" class="panel auth-panel">
@@ -37,15 +35,15 @@
 
       <section id="dashboard" class="hidden">
         <section class="panel topbar">
-          <div>
-            <p class="mini-label">Signed In As</p>
-            <h2 id="meLabel">Player</h2>
-          </div>
           <div class="header-actions">
             <button id="navLobbyBtn" class="ghost hidden">Back To Lobby</button>
             <button id="createPrivateBtn" class="primary">Create Private Room</button>
             <button id="findMatchBtn" class="secondary">Find Public Match</button>
             <button id="logoutBtn" class="ghost">Log Out</button>
+          </div>
+          <div class="account-chip">
+            <span class="mini-label">Signed In</span>
+            <strong id="meLabel">Player</strong>
           </div>
         </section>
 
@@ -153,6 +151,10 @@
                   </label>
                   <button id="secretBtn" class="primary">Lock Secret</button>
                 </div>
+                <div class="secret-reminder">
+                  <span class="mini-label">Your Current Secret</span>
+                  <strong id="secretWordDisplay">Not set</strong>
+                </div>
                 <p class="hint">No repeated letters. Your secret stays hidden from the other player.</p>
               </section>
 
@@ -168,6 +170,15 @@
                 <p class="hint">Duplicate guesses in the same round are blocked.</p>
               </section>
             </div>
+
+            <section class="panel">
+              <div class="section-heading">
+                <h3>Alphabet Tracker</h3>
+                <button id="clearAlphabetBtn" class="ghost">Clear Marks</button>
+              </div>
+              <p class="hint">Click once to circle a letter, click again to cross it off, click a third time to clear it.</p>
+              <div id="alphabetTracker" class="alphabet-tracker"></div>
+            </section>
 
             <section class="panel">
               <div class="section-heading">

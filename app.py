@@ -755,6 +755,7 @@ class GameStore:
             "is_your_turn": room["current_turn_user_id"] == user_id,
             "current_turn_name": current_turn_name,
             "my_secret_set": bool(me["secret_word"]),
+            "my_secret_word": me["secret_word"],
             "opponent_ready": bool(opponent and opponent["secret_word"]),
             "opponent_name": opponent["username"] if opponent else None,
             "can_restart": len(players) == PLAYER_LIMIT,
