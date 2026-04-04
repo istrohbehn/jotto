@@ -575,10 +575,11 @@ class GameStore:
         stats = conn.execute(
             """
             SELECT
-                SUM(CASE WHEN winner_user_id = ? THEN 1 ELSE 0 END) AS wins,
-                SUM(CASE WHEN winner_user_id IS NOT NULL AND winner_user_id != ? THEN 1 ELSE 0 END) AS losses,
-                SUM(CASE WHEN status = 'finished' THEN 1 ELSE 0 END) AS finished_games
-            FROM rooms
+                SUM(CASE WHEN round_results.winner_user_id = ? THEN 1 ELSE 0 END) AS wins,
+                SUM(CASE WHEN round_results.winner_user_id IS NOT NULL AND round_results.winner_user_id != ? THEN 1 ELSE 0 END) AS losses,
+                COUNT(*) AS finished_games
+            FROM round_results
+            JOIN rooms ON rooms.id = round_results.room_id
             WHERE EXISTS (
                 SELECT 1
                 FROM room_players
