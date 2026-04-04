@@ -76,8 +76,8 @@ h3 {
 }
 
 .auth-panel,
-.topbar,
 #invitePanel,
+.topbar-group,
 .game-page-header,
 .dashboard-grid,
 .game-panel {
@@ -92,6 +92,7 @@ h3 {
 .actions,
 .header-actions,
 .join-strip,
+.topbar-group,
 .stats-grid,
 .dashboard-grid,
 .status-grid,
@@ -111,13 +112,17 @@ h3 {
   grid-template-columns: 1.05fr 1fr;
 }
 
-.stats-grid,
+.topbar-group,
+.stats-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .status-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .board {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .field {
@@ -173,7 +178,6 @@ button:disabled {
   color: var(--text);
 }
 
-.topbar,
 .invite-copy,
 .section-heading,
 .game-page-header {
@@ -181,10 +185,6 @@ button:disabled {
   justify-content: space-between;
   align-items: center;
   gap: 14px;
-}
-
-.topbar {
-  justify-content: space-between;
 }
 
 .account-chip {
@@ -198,6 +198,7 @@ button:disabled {
   display: flex;
   align-items: center;
   gap: 12px;
+  justify-content: space-between;
 }
 
 .duel-heading {
@@ -207,29 +208,15 @@ button:disabled {
 
 .stat-card,
 .status-card,
-.history-card,
-.record-card {
+.history-card {
   padding: 16px;
 }
 
 .stat-card strong,
-.status-card strong,
-.record-card strong {
+.status-card strong {
   display: block;
   margin-top: 8px;
-  font-size: 1.45rem;
-}
-
-.record-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.record-card {
-  background: var(--panel-alt);
-  border: 1px solid var(--line);
-  border-radius: 14px;
+  font-size: 1.1rem;
 }
 
 .room-card {
@@ -256,36 +243,9 @@ button:disabled {
 }
 
 .rooms-list,
-.history-list,
-.players-list {
+.history-list {
   display: grid;
   gap: 12px;
-}
-
-.players-list {
-  list-style: none;
-  padding: 0;
-  margin: 14px 0 0;
-}
-
-.players-list li {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--panel-alt);
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 5px 9px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 0.8rem;
 }
 
 .secret-reminder {
@@ -358,7 +318,6 @@ button:disabled {
   .dashboard-grid,
   .status-grid,
   .stats-grid,
-  .record-grid,
   .board,
   .alphabet-tracker {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -373,6 +332,7 @@ button:disabled {
 
   .auth-grid,
   .join-strip,
+  .topbar-group,
   .dashboard-grid,
   .stats-grid,
   .status-grid,
@@ -382,7 +342,6 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 
-  .topbar,
   .invite-copy,
   .section-heading,
   .game-page-header,

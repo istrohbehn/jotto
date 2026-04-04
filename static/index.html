@@ -34,21 +34,6 @@
       </section>
 
       <section id="dashboard" class="hidden">
-        <section class="panel topbar">
-          <div id="topbarNav" class="header-actions">
-            <button id="navLobbyBtn" class="ghost hidden">Back To Lobby</button>
-            <button id="createPrivateBtn" class="primary">Create Private Room</button>
-            <button id="findMatchBtn" class="secondary">Find Public Match</button>
-          </div>
-          <div class="account-area">
-            <div class="account-chip">
-              <span class="mini-label">Signed In</span>
-              <strong id="meLabel">Player</strong>
-            </div>
-            <button id="logoutBtn" class="ghost">Log Out</button>
-          </div>
-        </section>
-
         <section id="invitePanel" class="panel hidden">
           <div class="invite-copy">
             <div>
@@ -61,6 +46,25 @@
         </section>
 
         <section id="lobbyView" class="view">
+          <div class="topbar-group">
+            <section class="panel lobby-actions-panel">
+              <div id="lobbyActions" class="header-actions">
+                <button id="createPrivateBtn" class="primary">Create Private Room</button>
+                <button id="findMatchBtn" class="secondary">Find Public Match</button>
+              </div>
+            </section>
+
+            <section class="panel account-panel">
+              <div class="account-area">
+                <div class="account-chip">
+                  <span class="mini-label">Signed In</span>
+                  <strong id="meLabel">Player</strong>
+                </div>
+                <button id="logoutBtn" class="ghost">Log Out</button>
+              </div>
+            </section>
+          </div>
+
           <div class="dashboard-grid">
             <section class="panel">
               <div class="section-heading">
@@ -97,21 +101,40 @@
 
             <section class="panel">
               <div class="section-heading">
-                <h3>Recent Rooms</h3>
-                <p class="hint">Open any room on its own page.</p>
+                <h3>Recent Games</h3>
+                <p class="hint">Open any game on its own page.</p>
               </div>
-              <div id="roomsEmpty" class="empty-state">Your room list will show up here after you play.</div>
+              <div id="roomsEmpty" class="empty-state">Your recent games will show up here after you play.</div>
               <div id="roomsList" class="rooms-list"></div>
             </section>
           </div>
         </section>
 
         <section id="gameView" class="view hidden">
+          <div class="topbar-group">
+            <section class="panel game-nav-panel">
+              <div id="topbarNav" class="header-actions">
+                <button id="navLobbyBtn" class="ghost hidden">Back To Lobby</button>
+              </div>
+            </section>
+
+            <section class="panel account-panel">
+              <div class="account-area">
+                <div class="account-chip">
+                  <span class="mini-label">Signed In</span>
+                  <strong id="gameMeLabel">Player</strong>
+                </div>
+                <button id="gameLogoutBtn" class="ghost">Log Out</button>
+              </div>
+            </section>
+          </div>
+
           <section class="panel game-page-header">
             <div class="duel-heading">
               <p class="mini-label">Private Jotto Duel</p>
               <h2 id="duelNames">Player 1 vs. Player 2</h2>
               <p id="roomCodeLabel" class="hint">------</p>
+              <p id="recordSummary" class="hint">Record: tied</p>
             </div>
             <div class="header-actions">
               <button id="copyLinkBtn" class="ghost">Copy Invite Link</button>
@@ -133,35 +156,9 @@
                 <span class="mini-label">Game</span>
                 <strong id="gameNumberText">1</strong>
               </article>
-              <article class="status-card">
-                <span class="mini-label">Opponent</span>
-                <strong id="opponentText">-</strong>
-              </article>
-            </div>
-
-            <section class="panel">
-              <div class="section-heading">
-                <h3>Record</h3>
-                <p class="hint">Wins and losses for the two players in this duel.</p>
-              </div>
-              <div class="record-grid">
-                <article class="record-card">
-                  <span class="mini-label" id="recordPlayerOneLabel">Player 1</span>
-                  <strong id="recordPlayerOneValue">0-0</strong>
-                </article>
-                <article class="record-card">
-                  <span class="mini-label" id="recordPlayerTwoLabel">Player 2</span>
-                  <strong id="recordPlayerTwoValue">0-0</strong>
-                </article>
-              </div>
             </section>
 
             <div class="board">
-              <section class="panel">
-                <h3>Players</h3>
-                <ul id="playersList" class="players-list"></ul>
-              </section>
-
               <section class="panel">
                 <h3>Secret Word</h3>
                 <div class="stack">

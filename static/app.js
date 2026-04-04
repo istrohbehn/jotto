@@ -18,11 +18,14 @@ const els = {
   signupBtn: document.getElementById("signupBtn"),
   loginBtn: document.getElementById("loginBtn"),
   meLabel: document.getElementById("meLabel"),
+  gameMeLabel: document.getElementById("gameMeLabel"),
   topbarNav: document.getElementById("topbarNav"),
   navLobbyBtn: document.getElementById("navLobbyBtn"),
+  lobbyActions: document.getElementById("lobbyActions"),
   createPrivateBtn: document.getElementById("createPrivateBtn"),
   findMatchBtn: document.getElementById("findMatchBtn"),
   logoutBtn: document.getElementById("logoutBtn"),
+  gameLogoutBtn: document.getElementById("gameLogoutBtn"),
   joinCodeInput: document.getElementById("joinCodeInput"),
   joinCodeBtn: document.getElementById("joinCodeBtn"),
   winsLabel: document.getElementById("winsLabel"),
@@ -44,12 +47,7 @@ const els = {
   statusText: document.getElementById("statusText"),
   turnText: document.getElementById("turnText"),
   gameNumberText: document.getElementById("gameNumberText"),
-  opponentText: document.getElementById("opponentText"),
-  recordPlayerOneLabel: document.getElementById("recordPlayerOneLabel"),
-  recordPlayerOneValue: document.getElementById("recordPlayerOneValue"),
-  recordPlayerTwoLabel: document.getElementById("recordPlayerTwoLabel"),
-  recordPlayerTwoValue: document.getElementById("recordPlayerTwoValue"),
-  playersList: document.getElementById("playersList"),
+  recordSummary: document.getElementById("recordSummary"),
   secretInput: document.getElementById("secretInput"),
   secretBtn: document.getElementById("secretBtn"),
   secretWordDisplay: document.getElementById("secretWordDisplay"),
@@ -200,14 +198,14 @@ function renderRooms(rooms) {
     const card = document.createElement("button");
     card.className = "room-card";
     card.type = "button";
+    const label = room.opponent_name ? `Private game vs. ${room.opponent_name}` : "Private game";
     card.innerHTML = `
       <div>
-        <strong>${room.room_code}</strong>
-        <p>${room.visibility === "public" ? "Public match" : "Private room"}${room.opponent_name ? ` vs ${room.opponent_name}` : ""}</p>
+        <strong>${label}</strong>
+        <p>${room.status}</p>
       </div>
       <div class="room-meta">
-        <span>${room.status}</span>
-        <span>Round ${room.round_number}</span>
+        <span>Game ${room.round_number}</span>
       </div>
     `;
     card.addEventListener("click", async () => {
@@ -215,22 +213,6 @@ function renderRooms(rooms) {
       await refresh();
     });
     els.roomsList.appendChild(card);
-  }
-}
-
-function renderPlayers(players) {
-  els.playersList.innerHTML = "";
-  for (const player of players) {
-    const item = document.createElement("li");
-    const name = document.createElement("strong");
-    name.textContent = player.is_you ? `${player.username} (You)` : player.username;
-
-    const badge = document.createElement("span");
-    badge.className = "badge";
-    badge.textContent = player.has_secret ? "Ready" : "Not ready";
-
-    item.append(name, badge);
-    els.playersList.appendChild(item);
   }
 }
 
@@ -288,7 +270,6 @@ function renderRoom(room) {
   }
 
   els.gamePanel.classList.remove("hidden");
-  renderPlayers(room.players);
   renderGuesses(room.guesses);
   renderHistory(room.round_history);
 
@@ -309,12 +290,14 @@ function renderRoom(room) {
   els.duelNames.textContent = `${playerOneName} vs. ${playerTwoName}`;
   els.roomCodeLabel.textContent = `Room ${room.room_code}`;
   els.gameNumberText.textContent = String(room.round_number);
-  els.opponentText.textContent = room.opponent_name || "Waiting";
   els.secretWordDisplay.textContent = room.my_secret_word ? room.my_secret_word.toUpperCase() : "Not set";
-  els.recordPlayerOneLabel.textContent = playerOneName;
-  els.recordPlayerOneValue.textContent = `${playerOneWins}-${playerTwoWins}`;
-  els.recordPlayerTwoLabel.textContent = playerTwoName;
-  els.recordPlayerTwoValue.textContent = `${playerTwoWins}-${playerOneWins}`;
+  if (playerOneWins === playerTwoWins) {
+    els.recordSummary.textContent = `Record: tied at ${playerOneWins}-${playerTwoWins}`;
+  } else if (playerOneWins > playerTwoWins) {
+    els.recordSummary.textContent = `Record: ${playerOneName} leads ${playerOneWins}-${playerTwoWins}`;
+  } else {
+    els.recordSummary.textContent = `Record: ${playerTwoName} leads ${playerTwoWins}-${playerOneWins}`;
+  }
 
   let statusMessage = "Waiting for a second player.";
   let turnMessage = "-";
@@ -343,8 +326,6 @@ function renderRoom(room) {
 function renderViews(user, room) {
   const showGame = Boolean(user && state.currentView === "game" && state.roomCode);
   els.navLobbyBtn.classList.toggle("hidden", !showGame);
-  els.createPrivateBtn.classList.toggle("hidden", showGame);
-  els.findMatchBtn.classList.toggle("hidden", showGame);
   els.lobbyView.classList.toggle("hidden", showGame);
   els.gameView.classList.toggle("hidden", !showGame);
 
@@ -370,6 +351,7 @@ function render() {
   }
 
   els.meLabel.textContent = user.username;
+  els.gameMeLabel.textContent = user.username;
   els.winsLabel.textContent = String(lobby?.stats?.wins || 0);
   els.lossesLabel.textContent = String(lobby?.stats?.losses || 0);
   els.finishedLabel.textContent = String(lobby?.stats?.finished_games || 0);
@@ -567,6 +549,7 @@ function bindEvents() {
   els.createPrivateBtn.addEventListener("click", createPrivateRoom);
   els.findMatchBtn.addEventListener("click", findMatch);
   els.logoutBtn.addEventListener("click", logout);
+  els.gameLogoutBtn.addEventListener("click", logout);
   els.joinCodeBtn.addEventListener("click", () => joinRoom(els.joinCodeInput.value));
   els.joinInviteBtn.addEventListener("click", () => joinRoom(state.roomCode));
   els.secretBtn.addEventListener("click", saveSecret);
