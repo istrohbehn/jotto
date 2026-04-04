@@ -194,17 +194,42 @@ button:disabled {
   text-align: right;
 }
 
+.account-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.duel-heading {
+  display: grid;
+  gap: 4px;
+}
+
 .stat-card,
 .status-card,
-.history-card {
+.history-card,
+.record-card {
   padding: 16px;
 }
 
 .stat-card strong,
-.status-card strong {
+.status-card strong,
+.record-card strong {
   display: block;
   margin-top: 8px;
   font-size: 1.45rem;
+}
+
+.record-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.record-card {
+  background: var(--panel-alt);
+  border: 1px solid var(--line);
+  border-radius: 14px;
 }
 
 .room-card {
@@ -333,6 +358,7 @@ button:disabled {
   .dashboard-grid,
   .status-grid,
   .stats-grid,
+  .record-grid,
   .board,
   .alphabet-tracker {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -368,6 +394,11 @@ button:disabled {
   .account-chip {
     justify-items: start;
     text-align: left;
+  }
+
+  .account-area {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .room-meta {

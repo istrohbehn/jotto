@@ -35,15 +35,17 @@
 
       <section id="dashboard" class="hidden">
         <section class="panel topbar">
-          <div class="header-actions">
+          <div id="topbarNav" class="header-actions">
             <button id="navLobbyBtn" class="ghost hidden">Back To Lobby</button>
             <button id="createPrivateBtn" class="primary">Create Private Room</button>
             <button id="findMatchBtn" class="secondary">Find Public Match</button>
-            <button id="logoutBtn" class="ghost">Log Out</button>
           </div>
-          <div class="account-chip">
-            <span class="mini-label">Signed In</span>
-            <strong id="meLabel">Player</strong>
+          <div class="account-area">
+            <div class="account-chip">
+              <span class="mini-label">Signed In</span>
+              <strong id="meLabel">Player</strong>
+            </div>
+            <button id="logoutBtn" class="ghost">Log Out</button>
           </div>
         </section>
 
@@ -106,9 +108,10 @@
 
         <section id="gameView" class="view hidden">
           <section class="panel game-page-header">
-            <div>
-              <p class="mini-label">Current Game</p>
-              <h2 id="roomCodeLabel">------</h2>
+            <div class="duel-heading">
+              <p class="mini-label">Private Jotto Duel</p>
+              <h2 id="duelNames">Player 1 vs. Player 2</h2>
+              <p id="roomCodeLabel" class="hint">------</p>
             </div>
             <div class="header-actions">
               <button id="copyLinkBtn" class="ghost">Copy Invite Link</button>
@@ -127,14 +130,31 @@
                 <strong id="turnText">-</strong>
               </article>
               <article class="status-card">
-                <span class="mini-label">Round</span>
-                <strong id="roundText">1</strong>
+                <span class="mini-label">Game</span>
+                <strong id="gameNumberText">1</strong>
               </article>
               <article class="status-card">
                 <span class="mini-label">Opponent</span>
                 <strong id="opponentText">-</strong>
               </article>
             </div>
+
+            <section class="panel">
+              <div class="section-heading">
+                <h3>Record</h3>
+                <p class="hint">Wins and losses for the two players in this duel.</p>
+              </div>
+              <div class="record-grid">
+                <article class="record-card">
+                  <span class="mini-label" id="recordPlayerOneLabel">Player 1</span>
+                  <strong id="recordPlayerOneValue">0-0</strong>
+                </article>
+                <article class="record-card">
+                  <span class="mini-label" id="recordPlayerTwoLabel">Player 2</span>
+                  <strong id="recordPlayerTwoValue">0-0</strong>
+                </article>
+              </div>
+            </section>
 
             <div class="board">
               <section class="panel">

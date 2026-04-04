@@ -18,6 +18,7 @@ const els = {
   signupBtn: document.getElementById("signupBtn"),
   loginBtn: document.getElementById("loginBtn"),
   meLabel: document.getElementById("meLabel"),
+  topbarNav: document.getElementById("topbarNav"),
   navLobbyBtn: document.getElementById("navLobbyBtn"),
   createPrivateBtn: document.getElementById("createPrivateBtn"),
   findMatchBtn: document.getElementById("findMatchBtn"),
@@ -36,13 +37,18 @@ const els = {
   inviteText: document.getElementById("inviteText"),
   joinInviteBtn: document.getElementById("joinInviteBtn"),
   gamePanel: document.getElementById("gamePanel"),
+  duelNames: document.getElementById("duelNames"),
   roomCodeLabel: document.getElementById("roomCodeLabel"),
   copyLinkBtn: document.getElementById("copyLinkBtn"),
   restartBtn: document.getElementById("restartBtn"),
   statusText: document.getElementById("statusText"),
   turnText: document.getElementById("turnText"),
-  roundText: document.getElementById("roundText"),
+  gameNumberText: document.getElementById("gameNumberText"),
   opponentText: document.getElementById("opponentText"),
+  recordPlayerOneLabel: document.getElementById("recordPlayerOneLabel"),
+  recordPlayerOneValue: document.getElementById("recordPlayerOneValue"),
+  recordPlayerTwoLabel: document.getElementById("recordPlayerTwoLabel"),
+  recordPlayerTwoValue: document.getElementById("recordPlayerTwoValue"),
   playersList: document.getElementById("playersList"),
   secretInput: document.getElementById("secretInput"),
   secretBtn: document.getElementById("secretBtn"),
@@ -286,10 +292,29 @@ function renderRoom(room) {
   renderGuesses(room.guesses);
   renderHistory(room.round_history);
 
-  els.roomCodeLabel.textContent = room.room_code;
-  els.roundText.textContent = String(room.round_number);
+  const orderedPlayerNames = room.players.map((player) => player.username);
+  const playerOneName = orderedPlayerNames[0] || "Player 1";
+  const playerTwoName = orderedPlayerNames[1] || "Player 2";
+  let playerOneWins = 0;
+  let playerTwoWins = 0;
+
+  for (const round of room.round_history) {
+    if (round.winner_name === playerOneName) {
+      playerOneWins += 1;
+    } else if (round.winner_name === playerTwoName) {
+      playerTwoWins += 1;
+    }
+  }
+
+  els.duelNames.textContent = `${playerOneName} vs. ${playerTwoName}`;
+  els.roomCodeLabel.textContent = `Room ${room.room_code}`;
+  els.gameNumberText.textContent = String(room.round_number);
   els.opponentText.textContent = room.opponent_name || "Waiting";
   els.secretWordDisplay.textContent = room.my_secret_word ? room.my_secret_word.toUpperCase() : "Not set";
+  els.recordPlayerOneLabel.textContent = playerOneName;
+  els.recordPlayerOneValue.textContent = `${playerOneWins}-${playerTwoWins}`;
+  els.recordPlayerTwoLabel.textContent = playerTwoName;
+  els.recordPlayerTwoValue.textContent = `${playerTwoWins}-${playerOneWins}`;
 
   let statusMessage = "Waiting for a second player.";
   let turnMessage = "-";
@@ -318,6 +343,8 @@ function renderRoom(room) {
 function renderViews(user, room) {
   const showGame = Boolean(user && state.currentView === "game" && state.roomCode);
   els.navLobbyBtn.classList.toggle("hidden", !showGame);
+  els.createPrivateBtn.classList.toggle("hidden", showGame);
+  els.findMatchBtn.classList.toggle("hidden", showGame);
   els.lobbyView.classList.toggle("hidden", showGame);
   els.gameView.classList.toggle("hidden", !showGame);
 
