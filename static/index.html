@@ -9,21 +9,20 @@
   <body>
     <main class="shell">
       <section class="hero">
-        <h1>Jotto</h1>
+        <h1 class="brand-title" aria-label="Jotto">
+          <span class="brand-j">J</span><span class="brand-o1">o</span><span class="brand-t1">t</span><span class="brand-t2">t</span><span class="brand-o2">o</span>
+        </h1>
       </section>
 
       <section id="authPanel" class="panel auth-panel">
-        <div class="auth-copy">
-          <h2>Sign In Or Create An Account</h2>
-          <p class="hint">Usernames use letters, numbers, and underscores. Passwords need at least 6 characters.</p>
-        </div>
+        <p class="auth-subtitle">A word duel</p>
         <div class="auth-grid">
           <label class="field">
-            <span>Username</span>
+            <span>Username <span class="hint-inline">(letters, numbers, underscores)</span></span>
             <input id="usernameInput" maxlength="20" placeholder="avery_plays" />
           </label>
           <label class="field">
-            <span>Password</span>
+            <span>Password <span class="hint-inline">(at least 6 characters)</span></span>
             <input id="passwordInput" type="password" placeholder="secretpass" />
           </label>
         </div>

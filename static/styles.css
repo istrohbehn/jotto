@@ -52,6 +52,36 @@ h1 {
   line-height: 0.95;
 }
 
+.brand-title {
+  letter-spacing: 0.01em;
+}
+
+.brand-j {
+  color: #8b5cf6;
+}
+
+.brand-o1 {
+  color: #3b82f6;
+}
+
+.brand-t1 {
+  color: #22c55e;
+}
+
+.brand-t2 {
+  color: #eab308;
+}
+
+.brand-o2 {
+  color: #ef4444;
+}
+
+.auth-subtitle {
+  margin-bottom: 14px;
+  color: #ffffff;
+  font-size: 1rem;
+}
+
 h2 {
   font-size: 1.8rem;
 }
@@ -82,10 +112,6 @@ h3 {
 .dashboard-grid,
 .game-panel {
   margin-bottom: 18px;
-}
-
-.auth-copy {
-  margin-bottom: 16px;
 }
 
 .auth-grid,
@@ -128,6 +154,12 @@ h3 {
 .field {
   display: grid;
   gap: 8px;
+}
+
+.hint-inline {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: normal;
 }
 
 input,
