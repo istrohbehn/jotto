@@ -19,9 +19,7 @@ const els = {
   loginBtn: document.getElementById("loginBtn"),
   meLabel: document.getElementById("meLabel"),
   gameMeLabel: document.getElementById("gameMeLabel"),
-  topbarNav: document.getElementById("topbarNav"),
   navLobbyBtn: document.getElementById("navLobbyBtn"),
-  lobbyActions: document.getElementById("lobbyActions"),
   createPrivateBtn: document.getElementById("createPrivateBtn"),
   findMatchBtn: document.getElementById("findMatchBtn"),
   logoutBtn: document.getElementById("logoutBtn"),
@@ -42,22 +40,26 @@ const els = {
   gamePanel: document.getElementById("gamePanel"),
   duelNames: document.getElementById("duelNames"),
   roomCodeLabel: document.getElementById("roomCodeLabel"),
+  recordSummary: document.getElementById("recordSummary"),
+  statusText: document.getElementById("statusText"),
+  gameNumberText: document.getElementById("gameNumberText"),
   copyLinkBtn: document.getElementById("copyLinkBtn"),
   restartBtn: document.getElementById("restartBtn"),
-  statusText: document.getElementById("statusText"),
-  turnText: document.getElementById("turnText"),
-  gameNumberText: document.getElementById("gameNumberText"),
-  recordSummary: document.getElementById("recordSummary"),
+  secretEntryBox: document.getElementById("secretEntryBox"),
   secretInput: document.getElementById("secretInput"),
   secretBtn: document.getElementById("secretBtn"),
   secretWordDisplay: document.getElementById("secretWordDisplay"),
+  secretHint: document.getElementById("secretHint"),
   guessInput: document.getElementById("guessInput"),
   guessBtn: document.getElementById("guessBtn"),
   alphabetTracker: document.getElementById("alphabetTracker"),
   clearAlphabetBtn: document.getElementById("clearAlphabetBtn"),
   guessesEmpty: document.getElementById("guessesEmpty"),
   guessesTable: document.getElementById("guessesTable"),
-  guessesBody: document.getElementById("guessesBody"),
+  guessColumnOneLabel: document.getElementById("guessColumnOneLabel"),
+  guessColumnTwoLabel: document.getElementById("guessColumnTwoLabel"),
+  guessesColumnOne: document.getElementById("guessesColumnOne"),
+  guessesColumnTwo: document.getElementById("guessesColumnTwo"),
   historyEmpty: document.getElementById("historyEmpty"),
   historyList: document.getElementById("historyList"),
   toast: document.getElementById("toast"),
@@ -94,12 +96,14 @@ function setBusy(isBusy) {
     els.createPrivateBtn,
     els.findMatchBtn,
     els.logoutBtn,
+    els.gameLogoutBtn,
     els.joinCodeBtn,
     els.joinInviteBtn,
     els.secretBtn,
     els.guessBtn,
     els.restartBtn,
     els.copyLinkBtn,
+    els.clearAlphabetBtn,
   ].forEach((button) => {
     if (button) {
       button.disabled = isBusy;
@@ -173,12 +177,8 @@ function cycleLetterState(letter) {
 }
 
 function renderAlphabetTracker() {
-  if (!els.alphabetTracker) {
-    return;
-  }
   els.alphabetTracker.innerHTML = "";
-  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-  for (const letter of letters) {
+  for (const letter of "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
     const button = document.createElement("button");
     const mark = state.alphabetMarks[letter] || "clear";
     button.type = "button";
@@ -189,48 +189,85 @@ function renderAlphabetTracker() {
   }
 }
 
+async function closeRoom(roomCode) {
+  setBusy(true);
+  try {
+    await api("/api/close-room", {
+      method: "POST",
+      body: JSON.stringify({ room_code: roomCode }),
+    });
+    if (state.roomCode === roomCode) {
+      goToLobby();
+    }
+    await refresh();
+  } catch (error) {
+    showToast(error.message);
+  } finally {
+    setBusy(false);
+  }
+}
+
 function renderRooms(rooms) {
   els.roomsList.innerHTML = "";
   const hasRooms = rooms.length > 0;
   els.roomsEmpty.classList.toggle("hidden", hasRooms);
 
   for (const room of rooms) {
-    const card = document.createElement("button");
+    const card = document.createElement("div");
     card.className = "room-card";
-    card.type = "button";
     const label = room.opponent_name ? `Private game vs. ${room.opponent_name}` : "Private game";
     card.innerHTML = `
       <div>
         <strong>${label}</strong>
         <p>${room.status}</p>
       </div>
-      <div class="room-meta">
-        <span>Game ${room.round_number}</span>
+      <div class="room-card-actions">
+        <div class="room-meta">
+          <span>Game ${room.round_number}</span>
+        </div>
+        <button class="ghost room-open-btn" type="button">Open</button>
+        <button class="ghost room-close-btn" type="button">Close</button>
       </div>
     `;
-    card.addEventListener("click", async () => {
+    card.querySelector(".room-open-btn").addEventListener("click", async () => {
       goToGame(room.room_code);
       await refresh();
+    });
+    card.querySelector(".room-close-btn").addEventListener("click", async () => {
+      await closeRoom(room.room_code);
     });
     els.roomsList.appendChild(card);
   }
 }
 
-function renderGuesses(guesses) {
-  els.guessesBody.innerHTML = "";
+function renderGuessEntries(container, entries) {
+  container.innerHTML = "";
+  if (entries.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "guess-entry guess-entry-empty";
+    empty.textContent = "No guesses yet";
+    container.appendChild(empty);
+    return;
+  }
+
+  for (const guess of entries) {
+    const item = document.createElement("div");
+    item.className = "guess-entry";
+    item.innerHTML = `<strong>${guess.guess.toUpperCase()}</strong><span>${guess.score}</span>`;
+    container.appendChild(item);
+  }
+}
+
+function renderGuesses(guesses, players) {
   const hasGuesses = guesses.length > 0;
   els.guessesEmpty.classList.toggle("hidden", hasGuesses);
   els.guessesTable.classList.toggle("hidden", !hasGuesses);
 
-  for (const guess of guesses) {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${guess.player_name}</td>
-      <td>${guess.guess.toUpperCase()}</td>
-      <td>${guess.score}</td>
-    `;
-    els.guessesBody.appendChild(row);
-  }
+  const [playerOneName = "Player 1", playerTwoName = "Player 2"] = players.map((player) => player.username);
+  els.guessColumnOneLabel.textContent = playerOneName;
+  els.guessColumnTwoLabel.textContent = playerTwoName;
+  renderGuessEntries(els.guessesColumnOne, guesses.filter((guess) => guess.player_name === playerOneName));
+  renderGuessEntries(els.guessesColumnTwo, guesses.filter((guess) => guess.player_name === playerTwoName));
 }
 
 function renderHistory(rounds) {
@@ -263,6 +300,19 @@ function renderInvite(invite, user) {
   els.joinInviteBtn.disabled = !invite.can_join;
 }
 
+function buildFinishedMessage(room) {
+  if (room.status !== "finished") {
+    return null;
+  }
+  if (!room.winner_name || !room.revealed_opponent_word) {
+    return `${room.winner_name} won.`;
+  }
+  if (room.winner_name === room.my_name) {
+    return `You won. ${room.opponent_name}'s word was ${room.revealed_opponent_word.toUpperCase()}.`;
+  }
+  return `You lost. ${room.opponent_name}'s word was ${room.revealed_opponent_word.toUpperCase()}.`;
+}
+
 function renderRoom(room) {
   if (!room) {
     els.gamePanel.classList.add("hidden");
@@ -270,7 +320,7 @@ function renderRoom(room) {
   }
 
   els.gamePanel.classList.remove("hidden");
-  renderGuesses(room.guesses);
+  renderGuesses(room.guesses, room.players);
   renderHistory(room.round_history);
 
   const orderedPlayerNames = room.players.map((player) => player.username);
@@ -291,6 +341,7 @@ function renderRoom(room) {
   els.roomCodeLabel.textContent = `Room ${room.room_code}`;
   els.gameNumberText.textContent = String(room.round_number);
   els.secretWordDisplay.textContent = room.my_secret_word ? room.my_secret_word.toUpperCase() : "Not set";
+
   if (playerOneWins === playerTwoWins) {
     els.recordSummary.textContent = `Record: tied at ${playerOneWins}-${playerTwoWins}`;
   } else if (playerOneWins > playerTwoWins) {
@@ -300,23 +351,21 @@ function renderRoom(room) {
   }
 
   let statusMessage = "Waiting for a second player.";
-  let turnMessage = "-";
-
   if (room.status === "setup") {
     statusMessage = room.my_secret_set ? "Waiting for the other player to lock in a word." : "Choose your secret word.";
-    turnMessage = "Secrets first";
   } else if (room.status === "playing") {
     statusMessage = room.is_your_turn ? "Your turn to guess." : `${room.current_turn_name || "Opponent"} is up.`;
-    turnMessage = room.is_your_turn ? "You" : (room.current_turn_name || "Opponent");
   } else if (room.status === "finished") {
-    statusMessage = `${room.winner_name} won with ${room.winning_word.toUpperCase()}.`;
-    turnMessage = "Round over";
+    statusMessage = buildFinishedMessage(room);
   }
 
   els.statusText.textContent = statusMessage;
-  els.turnText.textContent = turnMessage;
+  els.secretEntryBox.classList.toggle("hidden", room.my_secret_set);
   els.secretInput.disabled = room.my_secret_set;
   els.secretBtn.disabled = room.my_secret_set;
+  els.secretHint.textContent = room.my_secret_set
+    ? "Your secret is locked in for this game."
+    : "No repeated letters. Your secret stays hidden from the other player.";
   els.guessInput.disabled = !(room.status === "playing" && room.is_your_turn);
   els.guessBtn.disabled = !(room.status === "playing" && room.is_your_turn);
   els.restartBtn.classList.toggle("hidden", !(room.status === "finished" && room.can_restart));
@@ -325,7 +374,6 @@ function renderRoom(room) {
 
 function renderViews(user, room) {
   const showGame = Boolean(user && state.currentView === "game" && state.roomCode);
-  els.navLobbyBtn.classList.toggle("hidden", !showGame);
   els.lobbyView.classList.toggle("hidden", showGame);
   els.gameView.classList.toggle("hidden", !showGame);
 
@@ -505,7 +553,6 @@ async function restartRoom() {
       method: "POST",
       body: JSON.stringify({ room_code: state.roomCode }),
     });
-    els.secretInput.disabled = false;
     await refresh();
   } catch (error) {
     showToast(error.message);

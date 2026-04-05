@@ -500,6 +500,24 @@ class GameStore:
             )
             return ""
 
+    def close_room(self, user_id: int, room_code: str) -> str:
+        with self.lock, self._connect() as conn:
+            room = self._get_room_for_user(conn, room_code, user_id)
+            if not room:
+                return "Room not found."
+
+            conn.execute(
+                """
+                UPDATE rooms
+                SET status = 'closed',
+                    current_turn_user_id = NULL,
+                    updated_at = ?
+                WHERE id = ?
+                """,
+                (now_ts(), room["id"]),
+            )
+            return ""
+
     def get_bootstrap(self, user_id: Optional[int], room_code: str = "") -> dict:
         payload = {
             "user": None,
@@ -566,6 +584,7 @@ class GameStore:
             JOIN room_players me ON me.room_id = rooms.id
             LEFT JOIN users winner ON winner.id = rooms.winner_user_id
             WHERE me.user_id = ?
+              AND rooms.status != 'closed'
             ORDER BY rooms.updated_at DESC
             LIMIT 12
             """,
@@ -755,8 +774,10 @@ class GameStore:
             "winning_word": room["winning_word"],
             "is_your_turn": room["current_turn_user_id"] == user_id,
             "current_turn_name": current_turn_name,
+            "my_name": me["username"],
             "my_secret_set": bool(me["secret_word"]),
             "my_secret_word": me["secret_word"],
+            "revealed_opponent_word": opponent["secret_word"] if room["status"] == "finished" and opponent else None,
             "opponent_ready": bool(opponent and opponent["secret_word"]),
             "opponent_name": opponent["username"] if opponent else None,
             "can_restart": len(players) == PLAYER_LIMIT,
@@ -949,6 +970,14 @@ class JottoHandler(BaseHTTPRequestHandler):
 
         if parsed.path == "/api/restart":
             error = STORE.restart_room(user["id"], str(payload.get("room_code", "")))
+            if error:
+                self._json_response({"error": error}, status=HTTPStatus.BAD_REQUEST)
+                return
+            self._json_response({"ok": True})
+            return
+
+        if parsed.path == "/api/close-room":
+            error = STORE.close_room(user["id"], str(payload.get("room_code", "")))
             if error:
                 self._json_response({"error": error}, status=HTTPStatus.BAD_REQUEST)
                 return
