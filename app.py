@@ -505,11 +505,93 @@ class GameStore:
             room = self._get_room_for_user(conn, room_code, user_id)
             if not room:
                 return "Room not found."
+            if room["status"] in {"setup", "playing"}:
+                return "Only inactive games can be closed."
 
             conn.execute(
                 """
                 UPDATE rooms
                 SET status = 'closed',
+                    current_turn_user_id = NULL,
+                    updated_at = ?
+                WHERE id = ?
+                """,
+                (now_ts(), room["id"]),
+            )
+            return ""
+
+    def reopen_room(self, user_id: int, room_code: str) -> str:
+        with self.lock, self._connect() as conn:
+            room = self._get_room_for_user(conn, room_code, user_id)
+            if not room:
+                return "Room not found."
+            if room["status"] != "closed":
+                return "That game is already open."
+
+            players = conn.execute(
+                """
+                SELECT user_id, seat_order, secret_word
+                FROM room_players
+                WHERE room_id = ?
+                ORDER BY seat_order ASC
+                """,
+                (room["id"],),
+            ).fetchall()
+            player_count = len(players)
+
+            if room["winner_user_id"]:
+                conn.execute(
+                    """
+                    UPDATE rooms
+                    SET status = 'finished',
+                        current_turn_user_id = NULL,
+                        updated_at = ?
+                    WHERE id = ?
+                    """,
+                    (now_ts(), room["id"]),
+                )
+                return ""
+
+            if player_count < PLAYER_LIMIT:
+                conn.execute(
+                    """
+                    UPDATE rooms
+                    SET status = 'waiting',
+                        current_turn_user_id = NULL,
+                        updated_at = ?
+                    WHERE id = ?
+                    """,
+                    (now_ts(), room["id"]),
+                )
+                return ""
+
+            if all(player["secret_word"] for player in players):
+                guess_count = conn.execute(
+                    """
+                    SELECT COUNT(*) AS count
+                    FROM guesses
+                    WHERE room_id = ? AND round_number = ?
+                    """,
+                    (room["id"], room["round_number"]),
+                ).fetchone()["count"]
+                starter_index = (room["round_number"] - 1) % PLAYER_LIMIT
+                current_index = (starter_index + guess_count) % PLAYER_LIMIT
+                conn.execute(
+                    """
+                    UPDATE rooms
+                    SET status = 'playing',
+                        current_turn_user_id = ?,
+                        updated_at = ?
+                    WHERE id = ?
+                    """,
+                    (players[current_index]["user_id"], now_ts(), room["id"]),
+                )
+                return ""
+
+            conn.execute(
+                """
+                UPDATE rooms
+                SET status = 'setup',
                     current_turn_user_id = NULL,
                     updated_at = ?
                 WHERE id = ?
@@ -978,6 +1060,14 @@ class JottoHandler(BaseHTTPRequestHandler):
 
         if parsed.path == "/api/close-room":
             error = STORE.close_room(user["id"], str(payload.get("room_code", "")))
+            if error:
+                self._json_response({"error": error}, status=HTTPStatus.BAD_REQUEST)
+                return
+            self._json_response({"ok": True})
+            return
+
+        if parsed.path == "/api/reopen-room":
+            error = STORE.reopen_room(user["id"], str(payload.get("room_code", "")))
             if error:
                 self._json_response({"error": error}, status=HTTPStatus.BAD_REQUEST)
                 return

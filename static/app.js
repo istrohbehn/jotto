@@ -45,6 +45,7 @@ const els = {
   statusText: document.getElementById("statusText"),
   gameNumberText: document.getElementById("gameNumberText"),
   copyLinkBtn: document.getElementById("copyLinkBtn"),
+  reopenBtn: document.getElementById("reopenBtn"),
   restartBtn: document.getElementById("restartBtn"),
   secretEntryBox: document.getElementById("secretEntryBox"),
   secretInput: document.getElementById("secretInput"),
@@ -103,6 +104,7 @@ function setBusy(isBusy) {
     els.secretBtn,
     els.guessBtn,
     els.restartBtn,
+    els.reopenBtn,
     els.copyLinkBtn,
     els.clearAlphabetBtn,
   ].forEach((button) => {
@@ -314,6 +316,21 @@ function buildFinishedMessage(room) {
   return `You lost. ${room.opponent_name}'s word was ${room.revealed_opponent_word.toUpperCase()}.`;
 }
 
+async function reopenRoom() {
+  setBusy(true);
+  try {
+    await api("/api/reopen-room", {
+      method: "POST",
+      body: JSON.stringify({ room_code: state.roomCode }),
+    });
+    await refresh();
+  } catch (error) {
+    showToast(error.message);
+  } finally {
+    setBusy(false);
+  }
+}
+
 function renderRoom(room) {
   if (!room) {
     els.gamePanel.classList.add("hidden");
@@ -358,6 +375,8 @@ function renderRoom(room) {
     statusMessage = room.is_your_turn ? "Your turn to guess." : `${room.current_turn_name || "Opponent"} is up.`;
   } else if (room.status === "finished") {
     statusMessage = buildFinishedMessage(room);
+  } else if (room.status === "closed") {
+    statusMessage = "This game is closed.";
   }
 
   els.statusText.textContent = statusMessage;
@@ -369,6 +388,7 @@ function renderRoom(room) {
     : "No repeated letters. Your secret stays hidden from the other player.";
   els.guessInput.disabled = !(room.status === "playing" && room.is_your_turn);
   els.guessBtn.disabled = !(room.status === "playing" && room.is_your_turn);
+  els.reopenBtn.classList.toggle("hidden", room.status !== "closed");
   els.restartBtn.classList.toggle("hidden", !(room.status === "finished" && room.can_restart));
   renderAlphabetTracker();
 }
@@ -605,6 +625,7 @@ function bindEvents() {
   els.secretBtn.addEventListener("click", saveSecret);
   els.guessBtn.addEventListener("click", submitGuess);
   els.restartBtn.addEventListener("click", restartRoom);
+  els.reopenBtn.addEventListener("click", reopenRoom);
   els.copyLinkBtn.addEventListener("click", copyInviteLink);
   els.clearAlphabetBtn.addEventListener("click", () => {
     state.alphabetMarks = {};
