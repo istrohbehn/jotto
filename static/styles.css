@@ -82,6 +82,7 @@ h1 {
 
 .auth-panel,
 #invitePanel,
+.hero-nav,
 .topbar-group,
 .game-page-header,
 .dashboard-grid,
@@ -154,9 +155,11 @@ input:focus {
 button {
   border: none;
   border-radius: 12px;
-  padding: 12px 16px;
+  padding: 8px 0;
   cursor: pointer;
   transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+  background: transparent;
+  color: var(--text);
 }
 
 button:hover {
@@ -168,16 +171,12 @@ button:disabled {
   cursor: not-allowed;
 }
 
-.primary {
-  background: var(--button);
-  color: var(--button-text);
-}
-
+.primary,
 .secondary,
 .ghost,
 .room-open-btn,
 .room-close-btn {
-  background: var(--panel-alt);
+  background: transparent;
   color: var(--text);
 }
 
@@ -202,6 +201,11 @@ button:disabled {
 .header-status {
   display: grid;
   gap: 4px;
+}
+
+.hero-nav {
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .account-chip {
@@ -258,6 +262,10 @@ button:disabled {
 .guess-column-list {
   display: grid;
   gap: 12px;
+}
+
+.rooms-list {
+  margin-top: 18px;
 }
 
 .secret-reminder {

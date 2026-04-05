@@ -14,6 +14,10 @@
         </h1>
       </section>
 
+      <section id="heroNavBar" class="panel hero-nav hidden">
+        <button id="navLobbyBtn" class="ghost">Back To Lobby</button>
+      </section>
+
       <section id="authPanel" class="panel auth-panel">
         <p class="auth-subtitle">A word duel</p>
         <div class="auth-grid">
@@ -110,23 +114,15 @@
         </section>
 
         <section id="gameView" class="view hidden">
-          <div class="topbar-group">
-            <section class="panel game-nav-panel">
-              <div id="topbarNav" class="header-actions">
-                <button id="navLobbyBtn" class="ghost hidden">Back To Lobby</button>
+          <section class="panel account-panel account-panel-game">
+            <div class="account-area">
+              <div class="account-chip">
+                <span class="mini-label">Signed In</span>
+                <strong id="gameMeLabel">Player</strong>
               </div>
-            </section>
-
-            <section class="panel account-panel">
-              <div class="account-area">
-                <div class="account-chip">
-                  <span class="mini-label">Signed In</span>
-                  <strong id="gameMeLabel">Player</strong>
-                </div>
-                <button id="gameLogoutBtn" class="ghost">Log Out</button>
-              </div>
-            </section>
-          </div>
+              <button id="gameLogoutBtn" class="ghost">Log Out</button>
+            </div>
+          </section>
 
           <section class="panel game-page-header">
             <div class="duel-heading">

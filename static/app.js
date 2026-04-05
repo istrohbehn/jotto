@@ -11,6 +11,7 @@ const state = {
 const els = {
   authPanel: document.getElementById("authPanel"),
   dashboard: document.getElementById("dashboard"),
+  heroNavBar: document.getElementById("heroNavBar"),
   lobbyView: document.getElementById("lobbyView"),
   gameView: document.getElementById("gameView"),
   usernameInput: document.getElementById("usernameInput"),
@@ -374,6 +375,7 @@ function renderRoom(room) {
 
 function renderViews(user, room) {
   const showGame = Boolean(user && state.currentView === "game" && state.roomCode);
+  els.heroNavBar.classList.toggle("hidden", !showGame);
   els.lobbyView.classList.toggle("hidden", showGame);
   els.gameView.classList.toggle("hidden", !showGame);
 
@@ -393,6 +395,7 @@ function render() {
   els.dictionaryCount.textContent = `${data.words_count || 0} playable words loaded`;
 
   if (!user) {
+    els.heroNavBar.classList.add("hidden");
     renderInvite(data.invite, user);
     renderViews(null, null);
     return;
