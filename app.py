@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import json
 import os
@@ -6,6 +7,9 @@ import secrets
 import sqlite3
 import threading
 import time
+import urllib.error
+import urllib.parse
+import urllib.request
 from http import HTTPStatus
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -28,6 +32,16 @@ PLAYER_LIMIT = 2
 SESSION_COOKIE = "jotto_session"
 SESSION_MAX_AGE = 60 * 60 * 24 * 30
 USERNAME_RE = re.compile(r"^[a-zA-Z0-9_]{3,20}$")
+E164_PHONE_RE = re.compile(r"^\+[1-9]\d{7,14}$")
+TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID", "").strip()
+TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN", "").strip()
+TWILIO_VERIFY_SERVICE_SID = os.environ.get("TWILIO_VERIFY_SERVICE_SID", "").strip()
+TWILIO_FROM_NUMBER = os.environ.get("TWILIO_FROM_NUMBER", "").strip()
+PUBLIC_BASE_URL = (
+    os.environ.get("PUBLIC_BASE_URL")
+    or os.environ.get("RENDER_EXTERNAL_URL")
+    or f"http://localhost:{PORT}"
+).rstrip("/")
 
 
 def load_words() -> list[str]:
@@ -86,6 +100,77 @@ def clean_name(name_value) -> str:
     return name_value.strip()[:20]
 
 
+def normalize_phone(phone: str) -> str:
+    return re.sub(r"[^\d+]", "", str(phone).strip())
+
+
+def is_valid_e164(phone: str) -> bool:
+    return bool(E164_PHONE_RE.match(normalize_phone(phone)))
+
+
+class TwilioClient:
+    def __init__(self, account_sid: str, auth_token: str, verify_service_sid: str, from_number: str):
+        self.account_sid = account_sid
+        self.auth_token = auth_token
+        self.verify_service_sid = verify_service_sid
+        self.from_number = from_number
+
+    @property
+    def verify_ready(self) -> bool:
+        return bool(self.account_sid and self.auth_token and self.verify_service_sid)
+
+    @property
+    def messaging_ready(self) -> bool:
+        return bool(self.account_sid and self.auth_token and self.from_number)
+
+    def _request_form(self, url: str, params: dict[str, str]) -> dict:
+        data = urllib.parse.urlencode(params).encode("utf-8")
+        request = urllib.request.Request(url, data=data, method="POST")
+        credentials = f"{self.account_sid}:{self.auth_token}".encode("utf-8")
+        auth_header = base64.b64encode(credentials).decode("ascii")
+        request.add_header("Authorization", f"Basic {auth_header}")
+        request.add_header("Content-Type", "application/x-www-form-urlencoded")
+        try:
+            with urllib.request.urlopen(request, timeout=15) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as error:
+            payload = error.read().decode("utf-8", errors="ignore")
+            try:
+                parsed = json.loads(payload)
+            except json.JSONDecodeError:
+                parsed = {"message": payload or "Twilio request failed."}
+            message = parsed.get("message") or parsed.get("detail") or "Twilio request failed."
+            raise RuntimeError(message) from error
+
+    def start_verification(self, phone_number: str):
+        if not self.verify_ready:
+            raise RuntimeError("Phone verification is not configured on this server yet.")
+        self._request_form(
+            f"https://verify.twilio.com/v2/Services/{self.verify_service_sid}/Verifications",
+            {"To": phone_number, "Channel": "sms"},
+        )
+
+    def check_verification(self, phone_number: str, code: str) -> bool:
+        if not self.verify_ready:
+            raise RuntimeError("Phone verification is not configured on this server yet.")
+        result = self._request_form(
+            f"https://verify.twilio.com/v2/Services/{self.verify_service_sid}/VerificationCheck",
+            {"To": phone_number, "Code": code.strip()},
+        )
+        return result.get("status") == "approved"
+
+    def send_sms(self, phone_number: str, body: str):
+        if not self.messaging_ready:
+            return
+        self._request_form(
+            f"https://api.twilio.com/2010-04-01/Accounts/{self.account_sid}/Messages.json",
+            {"To": phone_number, "From": self.from_number, "Body": body},
+        )
+
+
+TWILIO = TwilioClient(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_VERIFY_SERVICE_SID, TWILIO_FROM_NUMBER)
+
+
 def hash_password(password: str, salt: Optional[str] = None) -> tuple[str, str]:
     salt = salt or secrets.token_hex(16)
     digest = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt.encode("utf-8"), 200_000)
@@ -123,6 +208,10 @@ class GameStore:
                     username TEXT NOT NULL UNIQUE COLLATE NOCASE,
                     password_hash TEXT NOT NULL,
                     password_salt TEXT NOT NULL,
+                    phone_number TEXT,
+                    phone_verified INTEGER NOT NULL DEFAULT 0,
+                    sms_opt_in INTEGER NOT NULL DEFAULT 0,
+                    sms_last_notified_at REAL,
                     created_at REAL NOT NULL
                 );
 
@@ -176,11 +265,30 @@ class GameStore:
                 );
                 """
             )
+            user_columns = {row["name"] for row in conn.execute("PRAGMA table_info(users)").fetchall()}
+            if "phone_number" not in user_columns:
+                conn.execute("ALTER TABLE users ADD COLUMN phone_number TEXT")
+            if "phone_verified" not in user_columns:
+                conn.execute("ALTER TABLE users ADD COLUMN phone_verified INTEGER NOT NULL DEFAULT 0")
+            if "sms_opt_in" not in user_columns:
+                conn.execute("ALTER TABLE users ADD COLUMN sms_opt_in INTEGER NOT NULL DEFAULT 0")
+            if "sms_last_notified_at" not in user_columns:
+                conn.execute("ALTER TABLE users ADD COLUMN sms_last_notified_at REAL")
             round_result_columns = {
                 row["name"] for row in conn.execute("PRAGMA table_info(round_results)").fetchall()
             }
             if "losing_word" not in round_result_columns:
                 conn.execute("ALTER TABLE round_results ADD COLUMN losing_word TEXT")
+
+    def _serialize_user(self, user: sqlite3.Row) -> dict:
+        return {
+            "id": user["id"],
+            "username": user["username"],
+            "created_at": user["created_at"],
+            "phone_number": user["phone_number"],
+            "phone_verified": bool(user["phone_verified"]),
+            "sms_opt_in": bool(user["sms_opt_in"]),
+        }
 
     def create_user(self, username: str, password: str) -> tuple[Optional[dict], str]:
         username = username.strip()
@@ -223,14 +331,17 @@ class GameStore:
     def _session_for_user(self, conn: sqlite3.Connection, user_id: int) -> dict:
         token = secrets.token_urlsafe(24)
         conn.execute("INSERT INTO sessions (token, user_id, created_at) VALUES (?, ?, ?)", (token, user_id, now_ts()))
-        user = conn.execute("SELECT id, username, created_at FROM users WHERE id = ?", (user_id,)).fetchone()
+        user = conn.execute(
+            """
+            SELECT id, username, created_at, phone_number, phone_verified, sms_opt_in
+            FROM users
+            WHERE id = ?
+            """,
+            (user_id,),
+        ).fetchone()
         return {
             "session_token": token,
-            "user": {
-                "id": user["id"],
-                "username": user["username"],
-                "created_at": user["created_at"],
-            },
+            "user": self._serialize_user(user),
         }
 
     def delete_session(self, token: str):
@@ -245,14 +356,101 @@ class GameStore:
         with self._connect() as conn:
             row = conn.execute(
                 """
-                SELECT users.id, users.username, users.created_at
+                SELECT users.id, users.username, users.created_at, users.phone_number, users.phone_verified, users.sms_opt_in
                 FROM sessions
                 JOIN users ON users.id = sessions.user_id
                 WHERE sessions.token = ?
                 """,
                 (token,),
             ).fetchone()
-            return dict(row) if row else None
+            return self._serialize_user(row) if row else None
+
+    def update_phone_settings(self, user_id: int, phone_number: str, sms_opt_in: bool) -> str:
+        normalized_phone = normalize_phone(phone_number)
+        if normalized_phone and not is_valid_e164(normalized_phone):
+            return "Phone number must be in E.164 format, like +15551234567."
+
+        with self.lock, self._connect() as conn:
+            existing = conn.execute(
+                "SELECT phone_number, phone_verified FROM users WHERE id = ?",
+                (user_id,),
+            ).fetchone()
+            if not existing:
+                return "User not found."
+            phone_changed = normalize_phone(existing["phone_number"] or "") != normalized_phone
+            conn.execute(
+                """
+                UPDATE users
+                SET phone_number = ?,
+                    phone_verified = CASE WHEN ? THEN 0 ELSE phone_verified END,
+                    sms_opt_in = ?,
+                    sms_last_notified_at = CASE WHEN ? THEN NULL ELSE sms_last_notified_at END
+                WHERE id = ?
+                """,
+                (normalized_phone or None, 1 if phone_changed else 0, 1 if sms_opt_in else 0, 1 if phone_changed else 0, user_id),
+            )
+        return ""
+
+    def start_phone_verification(self, user_id: int) -> str:
+        with self.lock, self._connect() as conn:
+            user = conn.execute("SELECT phone_number FROM users WHERE id = ?", (user_id,)).fetchone()
+        if not user or not user["phone_number"]:
+            return "Add a phone number first."
+        if not is_valid_e164(user["phone_number"]):
+            return "Phone number must be in E.164 format, like +15551234567."
+        try:
+            TWILIO.start_verification(user["phone_number"])
+        except RuntimeError as error:
+            return str(error)
+        return ""
+
+    def check_phone_verification(self, user_id: int, code: str) -> str:
+        code = str(code).strip()
+        if not code:
+            return "Enter the verification code."
+        with self.lock, self._connect() as conn:
+            user = conn.execute("SELECT phone_number FROM users WHERE id = ?", (user_id,)).fetchone()
+            if not user or not user["phone_number"]:
+                return "Add a phone number first."
+            try:
+                approved = TWILIO.check_verification(user["phone_number"], code)
+            except RuntimeError as error:
+                return str(error)
+            if not approved:
+                return "That code was not correct."
+            conn.execute(
+                "UPDATE users SET phone_verified = 1 WHERE id = ?",
+                (user_id,),
+            )
+        return ""
+
+    def _send_turn_notification(self, conn: sqlite3.Connection, room_id: int, room_code: str, next_user_id: Optional[int]):
+        if not next_user_id or not TWILIO.messaging_ready:
+            return
+        user = conn.execute(
+            """
+            SELECT username, phone_number, phone_verified, sms_opt_in, sms_last_notified_at
+            FROM users
+            WHERE id = ?
+            """,
+            (next_user_id,),
+        ).fetchone()
+        if not user:
+            return
+        if not user["phone_number"] or not user["phone_verified"] or not user["sms_opt_in"]:
+            return
+        last_sent = user["sms_last_notified_at"] or 0
+        if now_ts() - last_sent < 45:
+            return
+        message = f"Your turn in Jotto: {PUBLIC_BASE_URL}/?room={room_code}&view=game"
+        try:
+            TWILIO.send_sms(user["phone_number"], message)
+        except RuntimeError:
+            return
+        conn.execute(
+            "UPDATE users SET sms_last_notified_at = ? WHERE id = ?",
+            (now_ts(), next_user_id),
+        )
 
     def create_room(self, user_id: int, visibility: str) -> str:
         with self.lock, self._connect() as conn:
@@ -476,10 +674,12 @@ class GameStore:
                     (room["id"], room["round_number"], user_id, winner_secret, losing_word, finished_at),
                 )
             else:
+                next_turn_user_id = opponent["user_id"]
                 conn.execute(
                     "UPDATE rooms SET current_turn_user_id = ?, updated_at = ? WHERE id = ?",
-                    (opponent["user_id"], now_ts(), room["id"]),
+                    (next_turn_user_id, now_ts(), room["id"]),
                 )
+                self._send_turn_notification(conn, room["id"], room["room_code"], next_turn_user_id)
             return ""
 
     def restart_room(self, user_id: int, room_code: str) -> str:
@@ -594,6 +794,7 @@ class GameStore:
                     """,
                     (players[current_index]["user_id"], now_ts(), room["id"]),
                 )
+                self._send_turn_notification(conn, room["id"], room["room_code"], players[current_index]["user_id"])
                 return ""
 
             conn.execute(
@@ -615,12 +816,20 @@ class GameStore:
             "invite": None,
             "room": None,
             "words_count": len(WORD_LIST),
+            "sms_configured": TWILIO.verify_ready and TWILIO.messaging_ready,
         }
 
         if user_id:
             with self._connect() as conn:
-                user = conn.execute("SELECT id, username, created_at FROM users WHERE id = ?", (user_id,)).fetchone()
-                payload["user"] = dict(user) if user else None
+                user = conn.execute(
+                    """
+                    SELECT id, username, created_at, phone_number, phone_verified, sms_opt_in
+                    FROM users
+                    WHERE id = ?
+                    """,
+                    (user_id,),
+                ).fetchone()
+                payload["user"] = self._serialize_user(user) if user else None
                 if user:
                     payload["lobby"] = self._lobby_state(conn, user_id)
 
@@ -940,6 +1149,7 @@ class GameStore:
                 """,
                 (starter_user_id, now_ts(), room_id),
             )
+            self._send_turn_notification(conn, room_id, room["room_code"], starter_user_id)
             return
 
         conn.execute(
@@ -1044,6 +1254,34 @@ class JottoHandler(BaseHTTPRequestHandler):
                 self._json_response({"error": error}, status=HTTPStatus.BAD_REQUEST)
                 return
             self._json_response({"room_code": room_code})
+            return
+
+        if parsed.path == "/api/phone-settings":
+            error = STORE.update_phone_settings(
+                user["id"],
+                str(payload.get("phone_number", "")),
+                bool(payload.get("sms_opt_in")),
+            )
+            if error:
+                self._json_response({"error": error}, status=HTTPStatus.BAD_REQUEST)
+                return
+            self._json_response({"ok": True})
+            return
+
+        if parsed.path == "/api/phone/start-verification":
+            error = STORE.start_phone_verification(user["id"])
+            if error:
+                self._json_response({"error": error}, status=HTTPStatus.BAD_REQUEST)
+                return
+            self._json_response({"ok": True})
+            return
+
+        if parsed.path == "/api/phone/check-verification":
+            error = STORE.check_phone_verification(user["id"], str(payload.get("code", "")))
+            if error:
+                self._json_response({"error": error}, status=HTTPStatus.BAD_REQUEST)
+                return
+            self._json_response({"ok": True})
             return
 
         if parsed.path == "/api/set-secret":

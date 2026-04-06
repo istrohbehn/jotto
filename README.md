@@ -24,6 +24,28 @@ The SQLite database lives at `state/jotto.db` by default. You can override it wi
 JOTTO_DB_PATH=/some/path/jotto.db python3 app.py
 ```
 
+## Optional SMS turn alerts
+
+If you want players to get a text when it becomes their turn, set these environment variables:
+
+```bash
+TWILIO_ACCOUNT_SID=...
+TWILIO_AUTH_TOKEN=...
+TWILIO_VERIFY_SERVICE_SID=...
+TWILIO_FROM_NUMBER=+15551234567
+PUBLIC_BASE_URL=https://your-app-url.example.com
+```
+
+Then in the lobby, a player can:
+
+1. enter a phone number in E.164 format
+2. save it
+3. request a verification code
+4. verify the code
+5. opt in to turn alerts
+
+The app sends texts only to verified, opted-in numbers.
+
 ## Deploy it
 
 ### Option 1: Any host that runs Python directly

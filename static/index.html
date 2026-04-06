@@ -98,6 +98,30 @@
                   <strong id="waitingPublicLabel">0</strong>
                 </article>
               </div>
+              <div class="sms-settings">
+                <h4 class="sms-heading">Turn Text Alerts</h4>
+                <p id="smsConfigHint" class="hint hidden">Text alerts are not configured on this server yet.</p>
+                <label class="field">
+                  <span>Phone number (E.164 format)</span>
+                  <input id="phoneInput" placeholder="+15551234567" />
+                </label>
+                <label class="checkbox-row">
+                  <input id="smsOptInInput" type="checkbox" />
+                  <span>Text me when it becomes my turn</span>
+                </label>
+                <div class="sms-actions">
+                  <button id="savePhoneBtn" class="text-button invite-link-button" type="button">Save Number</button>
+                  <button id="sendCodeBtn" class="text-button" type="button">Send Code</button>
+                </div>
+                <div class="sms-verify-row">
+                  <label class="field sms-code-field">
+                    <span>Verification code</span>
+                    <input id="verifyCodeInput" inputmode="numeric" maxlength="10" placeholder="123456" />
+                  </label>
+                  <button id="verifyCodeBtn" class="text-button invite-link-button" type="button">Verify</button>
+                </div>
+                <p id="phoneStatusText" class="hint"></p>
+              </div>
             </section>
           </div>
 

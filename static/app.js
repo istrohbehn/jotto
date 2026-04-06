@@ -31,6 +31,14 @@ const els = {
   lossesLabel: document.getElementById("lossesLabel"),
   finishedLabel: document.getElementById("finishedLabel"),
   waitingPublicLabel: document.getElementById("waitingPublicLabel"),
+  phoneInput: document.getElementById("phoneInput"),
+  smsOptInInput: document.getElementById("smsOptInInput"),
+  savePhoneBtn: document.getElementById("savePhoneBtn"),
+  sendCodeBtn: document.getElementById("sendCodeBtn"),
+  verifyCodeInput: document.getElementById("verifyCodeInput"),
+  verifyCodeBtn: document.getElementById("verifyCodeBtn"),
+  phoneStatusText: document.getElementById("phoneStatusText"),
+  smsConfigHint: document.getElementById("smsConfigHint"),
   roomsEmpty: document.getElementById("roomsEmpty"),
   roomsList: document.getElementById("roomsList"),
   invitePanel: document.getElementById("invitePanel"),
@@ -99,6 +107,9 @@ function setBusy(isBusy) {
     els.findMatchBtn,
     els.heroLogoutBtn,
     els.joinCodeBtn,
+    els.savePhoneBtn,
+    els.sendCodeBtn,
+    els.verifyCodeBtn,
     els.joinInviteBtn,
     els.secretBtn,
     els.guessBtn,
@@ -240,6 +251,30 @@ function renderRooms(rooms) {
     });
     els.roomsList.appendChild(card);
   }
+}
+
+function renderSmsSettings(user, smsConfigured) {
+  els.smsConfigHint.classList.toggle("hidden", smsConfigured);
+  if (document.activeElement !== els.phoneInput) {
+    els.phoneInput.value = user?.phone_number || "";
+  }
+  if (document.activeElement !== els.smsOptInInput) {
+    els.smsOptInInput.checked = Boolean(user?.sms_opt_in);
+  }
+  const verified = Boolean(user?.phone_verified && user?.phone_number);
+  if (!smsConfigured) {
+    els.phoneStatusText.textContent = "Server setup still needed before texting can work.";
+  } else if (!user?.phone_number) {
+    els.phoneStatusText.textContent = "Add your phone number, save it, and send a code.";
+  } else if (verified && user?.sms_opt_in) {
+    els.phoneStatusText.textContent = `Verified for turn alerts at ${user.phone_number}.`;
+  } else if (verified) {
+    els.phoneStatusText.textContent = `Verified at ${user.phone_number}. Turn texts are currently off.`;
+  } else {
+    els.phoneStatusText.textContent = `Number saved at ${user.phone_number}. Verification still needed.`;
+  }
+  els.sendCodeBtn.disabled = !smsConfigured || !user?.phone_number;
+  els.verifyCodeBtn.disabled = !smsConfigured || !user?.phone_number;
 }
 
 function renderGuessEntries(container, entries) {
@@ -449,6 +484,7 @@ function render() {
   els.lossesLabel.textContent = String(lobby?.stats?.losses || 0);
   els.finishedLabel.textContent = String(lobby?.stats?.finished_games || 0);
   els.waitingPublicLabel.textContent = String(lobby?.public_waiting_count || 0);
+  renderSmsSettings(user, Boolean(data.sms_configured));
   renderRooms(lobby?.rooms || []);
   renderInvite(data.invite, user);
   renderViews(user, room);
@@ -540,6 +576,57 @@ async function joinRoom(roomCode) {
     els.joinCodeInput.value = "";
     goToGame(data.room_code);
     await refresh();
+  } catch (error) {
+    showToast(error.message);
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function savePhoneSettings() {
+  setBusy(true);
+  try {
+    await api("/api/phone-settings", {
+      method: "POST",
+      body: JSON.stringify({
+        phone_number: els.phoneInput.value.trim(),
+        sms_opt_in: els.smsOptInInput.checked,
+      }),
+    });
+    await refresh();
+    showToast("Phone settings saved.");
+  } catch (error) {
+    showToast(error.message);
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function startPhoneVerification() {
+  setBusy(true);
+  try {
+    await api("/api/phone/start-verification", {
+      method: "POST",
+      body: "{}",
+    });
+    showToast("Verification code sent.");
+  } catch (error) {
+    showToast(error.message);
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function checkPhoneVerification() {
+  setBusy(true);
+  try {
+    await api("/api/phone/check-verification", {
+      method: "POST",
+      body: JSON.stringify({ code: els.verifyCodeInput.value.trim() }),
+    });
+    els.verifyCodeInput.value = "";
+    await refresh();
+    showToast("Phone number verified.");
   } catch (error) {
     showToast(error.message);
   } finally {
@@ -645,6 +732,9 @@ function bindEvents() {
   els.createPrivateBtn.addEventListener("click", createPrivateRoom);
   els.findMatchBtn.addEventListener("click", findMatch);
   els.heroLogoutBtn.addEventListener("click", logout);
+  els.savePhoneBtn.addEventListener("click", savePhoneSettings);
+  els.sendCodeBtn.addEventListener("click", startPhoneVerification);
+  els.verifyCodeBtn.addEventListener("click", checkPhoneVerification);
   els.learnToggleBtn.addEventListener("click", () => {
     els.learnPanel.classList.toggle("hidden");
   });
