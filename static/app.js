@@ -11,8 +11,8 @@ const state = {
 const els = {
   authPanel: document.getElementById("authPanel"),
   dashboard: document.getElementById("dashboard"),
-  heroNavBar: document.getElementById("heroNavBar"),
   heroAccountBar: document.getElementById("heroAccountBar"),
+  brandHomeBtn: document.getElementById("brandHomeBtn"),
   learnToggleBtn: document.getElementById("learnToggleBtn"),
   learnPanel: document.getElementById("learnPanel"),
   lobbyView: document.getElementById("lobbyView"),
@@ -22,12 +22,9 @@ const els = {
   signupBtn: document.getElementById("signupBtn"),
   loginBtn: document.getElementById("loginBtn"),
   heroMeLabel: document.getElementById("heroMeLabel"),
-  gameMeLabel: document.getElementById("gameMeLabel"),
-  navLobbyBtn: document.getElementById("navLobbyBtn"),
   createPrivateBtn: document.getElementById("createPrivateBtn"),
   findMatchBtn: document.getElementById("findMatchBtn"),
   heroLogoutBtn: document.getElementById("heroLogoutBtn"),
-  gameLogoutBtn: document.getElementById("gameLogoutBtn"),
   joinCodeInput: document.getElementById("joinCodeInput"),
   joinCodeBtn: document.getElementById("joinCodeBtn"),
   winsLabel: document.getElementById("winsLabel"),
@@ -96,11 +93,9 @@ function setBusy(isBusy) {
   [
     els.signupBtn,
     els.loginBtn,
-    els.navLobbyBtn,
     els.createPrivateBtn,
     els.findMatchBtn,
     els.heroLogoutBtn,
-    els.gameLogoutBtn,
     els.joinCodeBtn,
     els.joinInviteBtn,
     els.secretBtn,
@@ -397,7 +392,6 @@ function renderRoom(room) {
 
 function renderViews(user, room) {
   const showGame = Boolean(user && state.currentView === "game" && state.roomCode);
-  els.heroNavBar.classList.toggle("hidden", !showGame);
   els.lobbyView.classList.toggle("hidden", showGame);
   els.gameView.classList.toggle("hidden", !showGame);
 
@@ -416,7 +410,6 @@ function render() {
   els.dashboard.classList.toggle("hidden", !user);
 
   if (!user) {
-    els.heroNavBar.classList.add("hidden");
     els.heroAccountBar.classList.add("hidden");
     els.learnPanel.classList.add("hidden");
     renderInvite(data.invite, user);
@@ -424,9 +417,8 @@ function render() {
     return;
   }
 
-  els.heroAccountBar.classList.toggle("hidden", state.currentView === "game");
+  els.heroAccountBar.classList.remove("hidden");
   els.heroMeLabel.textContent = user.username;
-  els.gameMeLabel.textContent = user.username;
   els.winsLabel.textContent = String(lobby?.stats?.wins || 0);
   els.lossesLabel.textContent = String(lobby?.stats?.losses || 0);
   els.finishedLabel.textContent = String(lobby?.stats?.finished_games || 0);
@@ -619,11 +611,14 @@ async function copyInviteLink() {
 function bindEvents() {
   els.signupBtn.addEventListener("click", () => auth("/api/signup"));
   els.loginBtn.addEventListener("click", () => auth("/api/login"));
-  els.navLobbyBtn.addEventListener("click", goToLobby);
+  els.brandHomeBtn.addEventListener("click", () => {
+    if (state.bootstrap?.user) {
+      goToLobby();
+    }
+  });
   els.createPrivateBtn.addEventListener("click", createPrivateRoom);
   els.findMatchBtn.addEventListener("click", findMatch);
   els.heroLogoutBtn.addEventListener("click", logout);
-  els.gameLogoutBtn.addEventListener("click", logout);
   els.learnToggleBtn.addEventListener("click", () => {
     els.learnPanel.classList.toggle("hidden");
   });

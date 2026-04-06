@@ -65,6 +65,7 @@ h1 {
 
 .brand-title {
   letter-spacing: 0.01em;
+  cursor: pointer;
 }
 
 .brand-j { color: #8b5cf6; }
@@ -93,7 +94,6 @@ h1 {
 
 .auth-panel,
 #invitePanel,
-.hero-nav,
 .game-page-header,
 .dashboard-grid,
 .game-panel {
@@ -278,18 +278,13 @@ button:disabled {
   padding-right: 0;
 }
 
-.hero-nav {
-  padding-top: 10px;
-  padding-bottom: 10px;
+#gameView > .panel,
+#gameView .board > .panel,
+#gameView > .game-panel > .panel {
   border: none;
   background: transparent;
   padding-left: 0;
   padding-right: 0;
-}
-
-.account-chip {
-  justify-items: end;
-  text-align: right;
 }
 
 .header-status {

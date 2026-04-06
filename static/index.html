@@ -10,7 +10,7 @@
     <main class="shell">
       <section class="hero hero-row">
         <div class="hero-brand">
-          <h1 class="brand-title" aria-label="Jotto">
+          <h1 id="brandHomeBtn" class="brand-title" aria-label="Jotto">
             <span class="brand-j">J</span><span class="brand-o1">o</span><span class="brand-t1">t</span><span class="brand-t2">t</span><span class="brand-o2">o</span>
           </h1>
           <p class="hero-subtitle">A word duel.</p>
@@ -21,10 +21,6 @@
           <strong id="heroMeLabel">Player</strong>
           <button id="heroLogoutBtn" class="text-button" type="button">Log Out</button>
         </div>
-      </section>
-
-      <section id="heroNavBar" class="panel hero-nav hidden">
-        <button id="navLobbyBtn" class="ghost">Back To Lobby</button>
       </section>
 
       <section id="authPanel" class="panel auth-panel">
@@ -121,19 +117,8 @@
         </section>
 
         <section id="gameView" class="view hidden">
-          <section class="panel account-panel account-panel-game">
-            <div class="account-area">
-              <div class="account-chip">
-                <span class="mini-label">Signed In</span>
-                <strong id="gameMeLabel">Player</strong>
-              </div>
-              <button id="gameLogoutBtn" class="text-button" type="button">Log Out</button>
-            </div>
-          </section>
-
           <section class="panel game-page-header">
             <div class="duel-heading">
-              <p class="mini-label">Private Jotto Duel</p>
               <h2 id="duelNames">Player 1 vs. Player 2</h2>
               <p id="roomCodeLabel" class="hint">Room ------</p>
               <p id="recordSummary" class="hint">Record: tied</p>
