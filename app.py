@@ -1260,7 +1260,7 @@ class JottoHandler(BaseHTTPRequestHandler):
             error = STORE.update_phone_settings(
                 user["id"],
                 str(payload.get("phone_number", "")),
-                bool(payload.get("sms_opt_in")),
+                bool(str(payload.get("phone_number", "")).strip()),
             )
             if error:
                 self._json_response({"error": error}, status=HTTPStatus.BAD_REQUEST)

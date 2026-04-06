@@ -6,6 +6,7 @@ const state = {
   currentView: params.get("view") === "game" ? "game" : "lobby",
   pollHandle: null,
   alphabetMarks: {},
+  phoneDraft: "",
 };
 
 const els = {
@@ -32,7 +33,6 @@ const els = {
   finishedLabel: document.getElementById("finishedLabel"),
   waitingPublicLabel: document.getElementById("waitingPublicLabel"),
   phoneInput: document.getElementById("phoneInput"),
-  smsOptInInput: document.getElementById("smsOptInInput"),
   savePhoneBtn: document.getElementById("savePhoneBtn"),
   sendCodeBtn: document.getElementById("sendCodeBtn"),
   verifyCodeInput: document.getElementById("verifyCodeInput"),
@@ -255,21 +255,18 @@ function renderRooms(rooms) {
 
 function renderSmsSettings(user, smsConfigured) {
   els.smsConfigHint.classList.toggle("hidden", smsConfigured);
-  if (document.activeElement !== els.phoneInput) {
-    els.phoneInput.value = user?.phone_number || "";
+  const savedPhone = user?.phone_number || "";
+  if (!state.phoneDraft || state.phoneDraft === savedPhone) {
+    state.phoneDraft = savedPhone;
   }
-  if (document.activeElement !== els.smsOptInInput) {
-    els.smsOptInInput.checked = Boolean(user?.sms_opt_in);
-  }
+  els.phoneInput.value = state.phoneDraft;
   const verified = Boolean(user?.phone_verified && user?.phone_number);
   if (!smsConfigured) {
     els.phoneStatusText.textContent = "Server setup still needed before texting can work.";
   } else if (!user?.phone_number) {
     els.phoneStatusText.textContent = "Add your phone number, save it, and send a code.";
-  } else if (verified && user?.sms_opt_in) {
-    els.phoneStatusText.textContent = `Verified for turn alerts at ${user.phone_number}.`;
   } else if (verified) {
-    els.phoneStatusText.textContent = `Verified at ${user.phone_number}. Turn texts are currently off.`;
+    els.phoneStatusText.textContent = `Verified for turn alerts at ${user.phone_number}.`;
   } else {
     els.phoneStatusText.textContent = `Number saved at ${user.phone_number}. Verification still needed.`;
   }
@@ -589,10 +586,10 @@ async function savePhoneSettings() {
     await api("/api/phone-settings", {
       method: "POST",
       body: JSON.stringify({
-        phone_number: els.phoneInput.value.trim(),
-        sms_opt_in: els.smsOptInInput.checked,
+        phone_number: state.phoneDraft.trim(),
       }),
     });
+    state.phoneDraft = state.phoneDraft.trim();
     await refresh();
     showToast("Phone settings saved.");
   } catch (error) {
@@ -732,6 +729,9 @@ function bindEvents() {
   els.createPrivateBtn.addEventListener("click", createPrivateRoom);
   els.findMatchBtn.addEventListener("click", findMatch);
   els.heroLogoutBtn.addEventListener("click", logout);
+  els.phoneInput.addEventListener("input", (event) => {
+    state.phoneDraft = event.target.value;
+  });
   els.savePhoneBtn.addEventListener("click", savePhoneSettings);
   els.sendCodeBtn.addEventListener("click", startPhoneVerification);
   els.verifyCodeBtn.addEventListener("click", checkPhoneVerification);
