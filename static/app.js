@@ -35,12 +35,16 @@ const els = {
   finishedLabel: document.getElementById("finishedLabel"),
   waitingPublicLabel: document.getElementById("waitingPublicLabel"),
   phoneInput: document.getElementById("phoneInput"),
-  savePhoneBtn: document.getElementById("savePhoneBtn"),
   sendCodeBtn: document.getElementById("sendCodeBtn"),
   verifyCodeInput: document.getElementById("verifyCodeInput"),
   verifyCodeBtn: document.getElementById("verifyCodeBtn"),
   phoneStatusText: document.getElementById("phoneStatusText"),
   smsConfigHint: document.getElementById("smsConfigHint"),
+  smsSetupForm: document.getElementById("smsSetupForm"),
+  smsVerifyBlock: document.getElementById("smsVerifyBlock"),
+  smsVerifiedBlock: document.getElementById("smsVerifiedBlock"),
+  verifiedPhoneText: document.getElementById("verifiedPhoneText"),
+  removeNotificationsBtn: document.getElementById("removeNotificationsBtn"),
   roomsEmpty: document.getElementById("roomsEmpty"),
   roomsList: document.getElementById("roomsList"),
   invitePanel: document.getElementById("invitePanel"),
@@ -109,9 +113,9 @@ function setBusy(isBusy) {
     els.findMatchBtn,
     els.heroLogoutBtn,
     els.joinCodeBtn,
-    els.savePhoneBtn,
     els.sendCodeBtn,
     els.verifyCodeBtn,
+    els.removeNotificationsBtn,
     els.joinInviteBtn,
     els.secretBtn,
     els.guessBtn,
@@ -271,17 +275,23 @@ function renderSmsSettings(user, smsConfigured) {
   }
   els.phoneInput.value = state.phoneDraft;
   const verified = Boolean(user?.phone_verified && user?.phone_number);
+  const hasPhone = Boolean(user?.phone_number);
+  els.smsSetupForm.classList.toggle("hidden", verified);
+  els.smsVerifyBlock.classList.toggle("hidden", verified || !hasPhone);
+  els.smsVerifiedBlock.classList.toggle("hidden", !verified);
+  els.verifiedPhoneText.textContent = verified ? `${user.phone_number} is verified.` : "";
   if (!smsConfigured) {
     els.phoneStatusText.textContent = "Server setup still needed before texting can work.";
-  } else if (!user?.phone_number) {
-    els.phoneStatusText.textContent = "Add your phone number, save it, and send a code.";
+  } else if (!hasPhone) {
+    els.phoneStatusText.textContent = "Add your phone number to receive turn texts.";
   } else if (verified) {
-    els.phoneStatusText.textContent = `Verified for turn alerts at ${user.phone_number}.`;
+    els.phoneStatusText.textContent = "";
   } else {
-    els.phoneStatusText.textContent = `Number saved at ${user.phone_number}. Verification still needed.`;
+    els.phoneStatusText.textContent = `Enter the verification code sent to ${user.phone_number}.`;
   }
-  els.sendCodeBtn.disabled = !smsConfigured || !user?.phone_number;
-  els.verifyCodeBtn.disabled = !smsConfigured || !user?.phone_number;
+  els.sendCodeBtn.disabled = !smsConfigured || !state.phoneDraft.trim();
+  els.verifyCodeBtn.disabled = !smsConfigured || !hasPhone;
+  els.removeNotificationsBtn.disabled = !verified;
 }
 
 function renderGuessEntries(container, entries) {
@@ -592,7 +602,7 @@ async function joinRoom(roomCode) {
   }
 }
 
-async function savePhoneSettings() {
+async function startPhoneVerification() {
   setBusy(true);
   try {
     await api("/api/phone-settings", {
@@ -602,22 +612,11 @@ async function savePhoneSettings() {
       }),
     });
     state.phoneDraft = state.phoneDraft.trim();
-    await refresh();
-    showToast("Phone settings saved.");
-  } catch (error) {
-    showToast(error.message);
-  } finally {
-    setBusy(false);
-  }
-}
-
-async function startPhoneVerification() {
-  setBusy(true);
-  try {
     await api("/api/phone/start-verification", {
       method: "POST",
       body: "{}",
     });
+    await refresh();
     showToast("Verification code sent.");
   } catch (error) {
     showToast(error.message);
@@ -636,6 +635,24 @@ async function checkPhoneVerification() {
     els.verifyCodeInput.value = "";
     await refresh();
     showToast("Phone number verified.");
+  } catch (error) {
+    showToast(error.message);
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function removeNotifications() {
+  setBusy(true);
+  try {
+    await api("/api/phone-settings", {
+      method: "POST",
+      body: JSON.stringify({ phone_number: "" }),
+    });
+    state.phoneDraft = "";
+    els.verifyCodeInput.value = "";
+    await refresh();
+    showToast("Text notifications removed.");
   } catch (error) {
     showToast(error.message);
   } finally {
@@ -745,9 +762,9 @@ function bindEvents() {
   els.phoneInput.addEventListener("input", (event) => {
     state.phoneDraft = event.target.value;
   });
-  els.savePhoneBtn.addEventListener("click", savePhoneSettings);
   els.sendCodeBtn.addEventListener("click", startPhoneVerification);
   els.verifyCodeBtn.addEventListener("click", checkPhoneVerification);
+  els.removeNotificationsBtn.addEventListener("click", removeNotifications);
   els.learnToggleBtn.addEventListener("click", () => {
     els.learnPanel.classList.toggle("hidden");
   });

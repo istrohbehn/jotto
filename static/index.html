@@ -210,26 +210,29 @@
 
         <section id="notificationsView" class="view hidden">
           <section class="panel notifications-page">
-            <div class="section-heading">
-              <h3>Notification Settings</h3>
-            </div>
             <div class="sms-settings">
-              <h4 class="sms-heading">Turn Text Alerts</h4>
+              <h3 class="sms-heading">Text alerts</h3>
+              <p class="hint">Receive texts when it is your turn.</p>
               <p id="smsConfigHint" class="hint hidden">Text alerts are not configured on this server yet.</p>
-              <label class="field">
-                <span>Phone number (E.164 format)</span>
-                <input id="phoneInput" placeholder="+15551234567" />
-              </label>
-              <div class="sms-actions">
-                <button id="savePhoneBtn" class="text-button invite-link-button" type="button">Save Number</button>
-                <button id="sendCodeBtn" class="text-button" type="button">Send Code</button>
+              <div id="smsSetupForm" class="sms-setup-form">
+                <label class="field">
+                  <span>Phone number</span>
+                  <input id="phoneInput" placeholder="+15551234567" />
+                </label>
+                <div class="sms-actions">
+                  <button id="sendCodeBtn" class="text-button invite-link-button" type="button">Send code to verify</button>
+                </div>
               </div>
-              <div class="sms-verify-row">
+              <div id="smsVerifyBlock" class="sms-verify-block">
                 <label class="field sms-code-field">
                   <span>Verification code</span>
                   <input id="verifyCodeInput" inputmode="numeric" maxlength="10" placeholder="123456" />
                 </label>
                 <button id="verifyCodeBtn" class="text-button invite-link-button" type="button">Verify</button>
+              </div>
+              <div id="smsVerifiedBlock" class="sms-verified-block hidden">
+                <p id="verifiedPhoneText"></p>
+                <button id="removeNotificationsBtn" class="text-button invite-link-button" type="button">Remove text notifications</button>
               </div>
               <p id="phoneStatusText" class="hint"></p>
             </div>

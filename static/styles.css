@@ -150,12 +150,20 @@ h1 {
 }
 
 .sms-heading {
-  font-size: 1.1rem;
+  font-size: 1.4rem;
   font-style: italic;
 }
 
+.sms-setup-form,
+.sms-verify-block,
+.sms-verified-block {
+  display: grid;
+  gap: 14px;
+}
+
 .sms-actions,
-.sms-verify-row {
+.sms-verify-row,
+.sms-verify-block {
   display: flex;
   align-items: end;
   gap: 12px;
@@ -163,6 +171,10 @@ h1 {
 
 .sms-code-field {
   flex: 1;
+}
+
+.sms-verified-block p {
+  font-size: 1.05rem;
 }
 
 .learn-more {
