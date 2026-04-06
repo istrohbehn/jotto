@@ -252,7 +252,6 @@ button:disabled {
 
 .invite-copy,
 .section-heading,
-.game-page-header,
 .account-area,
 .room-card,
 .room-card-actions {
@@ -297,6 +296,13 @@ button:disabled {
   min-width: 220px;
 }
 
+.game-page-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: start;
+  column-gap: 24px;
+}
+
 .duel-heading h2,
 .game-section-title {
   font-size: 1.75rem;
@@ -304,8 +310,20 @@ button:disabled {
 }
 
 .duel-heading {
+  grid-column: 2;
   justify-items: center;
   text-align: center;
+}
+
+.header-status {
+  grid-column: 1;
+  justify-self: start;
+}
+
+.header-actions {
+  grid-column: 3;
+  justify-self: end;
+  justify-items: end;
 }
 
 .header-status-row {
@@ -410,6 +428,14 @@ button:disabled {
   min-width: 72px;
 }
 
+.guess-stack {
+  gap: 18px;
+}
+
+#guessBtn {
+  justify-self: start;
+}
+
 .secret-reminder {
   margin-top: 4px;
 }
@@ -510,6 +536,7 @@ button:disabled {
   .stats-grid,
   .guess-columns,
   .board,
+  .game-page-header,
   .header-actions,
   .actions {
     grid-template-columns: 1fr;

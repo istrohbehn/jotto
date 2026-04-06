@@ -118,12 +118,6 @@
 
         <section id="gameView" class="view hidden">
           <section class="panel game-page-header">
-            <div class="duel-heading">
-              <h2 id="duelNames">Player 1 vs. Player 2</h2>
-              <p id="roomCodeLabel" class="hint">Room ------</p>
-              <p id="recordSummary" class="hint">Record: tied</p>
-            </div>
-
             <div class="header-status">
               <div class="header-status-row">
                 <span class="mini-label">Status</span>
@@ -133,6 +127,12 @@
                 <span class="mini-label">Game</span>
                 <strong id="gameNumberText">1</strong>
               </div>
+            </div>
+
+            <div class="duel-heading">
+              <h2 id="duelNames">Player 1 vs. Player 2</h2>
+              <p id="roomCodeLabel" class="hint">Room ------</p>
+              <p id="recordSummary" class="hint">Record: tied</p>
             </div>
 
             <div class="header-actions">
@@ -160,8 +160,8 @@
               </section>
 
               <section class="panel">
-                <h3>Guess</h3>
-                <div class="stack">
+                <h3 class="game-section-title">Guess</h3>
+                <div class="stack guess-stack">
                   <label class="field">
                     <input id="guessInput" maxlength="5" placeholder="flags" />
                   </label>
