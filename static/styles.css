@@ -182,6 +182,10 @@ h1 {
 
 .sms-verified-block p {
   font-size: 1.05rem;
+  color: var(--text);
+}
+
+.verified-word {
   color: #22c55e;
 }
 

@@ -279,7 +279,9 @@ function renderSmsSettings(user, smsConfigured) {
   els.smsSetupForm.classList.toggle("hidden", verified);
   els.smsVerifyBlock.classList.toggle("hidden", verified || !hasPhone);
   els.smsVerifiedBlock.classList.toggle("hidden", !verified);
-  els.verifiedPhoneText.textContent = verified ? `${user.phone_number} is verified.` : "";
+  els.verifiedPhoneText.innerHTML = verified
+    ? `${user.phone_number} is <span class="verified-word">verified</span>.`
+    : "";
   if (!smsConfigured) {
     els.phoneStatusText.textContent = "Server setup still needed before texting can work.";
   } else if (!hasPhone) {
