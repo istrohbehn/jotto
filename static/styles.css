@@ -307,6 +307,13 @@ button:disabled {
   margin-top: 18px;
 }
 
+.auth-button {
+  border: 1px solid #ffffff;
+  padding: 10px 14px;
+  width: auto;
+  justify-self: start;
+}
+
 .invite-copy,
 .section-heading,
 .account-area,
