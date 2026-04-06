@@ -13,6 +13,8 @@ const els = {
   dashboard: document.getElementById("dashboard"),
   heroNavBar: document.getElementById("heroNavBar"),
   heroAccountBar: document.getElementById("heroAccountBar"),
+  learnToggleBtn: document.getElementById("learnToggleBtn"),
+  learnPanel: document.getElementById("learnPanel"),
   lobbyView: document.getElementById("lobbyView"),
   gameView: document.getElementById("gameView"),
   usernameInput: document.getElementById("usernameInput"),
@@ -416,6 +418,7 @@ function render() {
   if (!user) {
     els.heroNavBar.classList.add("hidden");
     els.heroAccountBar.classList.add("hidden");
+    els.learnPanel.classList.add("hidden");
     renderInvite(data.invite, user);
     renderViews(null, null);
     return;
@@ -621,6 +624,9 @@ function bindEvents() {
   els.findMatchBtn.addEventListener("click", findMatch);
   els.heroLogoutBtn.addEventListener("click", logout);
   els.gameLogoutBtn.addEventListener("click", logout);
+  els.learnToggleBtn.addEventListener("click", () => {
+    els.learnPanel.classList.toggle("hidden");
+  });
   els.joinCodeBtn.addEventListener("click", () => joinRoom(els.joinCodeInput.value));
   els.joinInviteBtn.addEventListener("click", () => joinRoom(state.roomCode));
   els.secretBtn.addEventListener("click", saveSecret);

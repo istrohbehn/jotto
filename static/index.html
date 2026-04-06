@@ -3,15 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jotto Duel</title>
+    <title>Jotto</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <main class="shell">
       <section class="hero hero-row">
-        <h1 class="brand-title" aria-label="Jotto">
-          <span class="brand-j">J</span><span class="brand-o1">o</span><span class="brand-t1">t</span><span class="brand-t2">t</span><span class="brand-o2">o</span>
-        </h1>
+        <div class="hero-brand">
+          <h1 class="brand-title" aria-label="Jotto">
+            <span class="brand-j">J</span><span class="brand-o1">o</span><span class="brand-t1">t</span><span class="brand-t2">t</span><span class="brand-o2">o</span>
+          </h1>
+          <p class="hero-subtitle">A word duel.</p>
+        </div>
 
         <div id="heroAccountBar" class="hero-account hidden">
           <span class="mini-label">Signed In</span>
@@ -25,7 +28,6 @@
       </section>
 
       <section id="authPanel" class="panel auth-panel">
-        <p class="auth-subtitle">A word duel</p>
         <div class="auth-grid">
           <label class="field">
             <span>Username <span class="hint-inline">(letters, numbers, underscores)</span></span>
@@ -102,6 +104,20 @@
               </div>
             </section>
           </div>
+
+          <section class="learn-more">
+            <button id="learnToggleBtn" class="text-button learn-toggle" type="button">New to play?</button>
+            <div id="learnPanel" class="learn-panel hidden">
+              <ol class="learn-list">
+                <li>Challenge a friend or stranger or enemy.</li>
+                <li>Pick a five letter word as your secret word.</li>
+                <li>Guess your opponent's word with five-letter word guesses; after each guess, you will be shown how many letters you had correct (though does not tell you about location of the letter!)</li>
+                <li>Keep guessing and logic your way to the word.</li>
+                <li>Victory (or defeat).</li>
+                <li>Again.</li>
+              </ol>
+            </div>
+          </section>
         </section>
 
         <section id="gameView" class="view hidden">

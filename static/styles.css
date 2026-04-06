@@ -38,6 +38,11 @@ body {
   gap: 16px;
 }
 
+.hero-brand {
+  display: grid;
+  gap: 8px;
+}
+
 .mini-label,
 .hint,
 .room-meta,
@@ -68,8 +73,7 @@ h1 {
 .brand-t2 { color: #eab308; }
 .brand-o2 { color: #ef4444; }
 
-.auth-subtitle {
-  margin-bottom: 14px;
+.hero-subtitle {
   color: #ffffff;
   font-size: 1rem;
 }
@@ -133,6 +137,28 @@ h1 {
 
 .join-by-code {
   margin-top: 22px;
+}
+
+.learn-more {
+  margin-top: 34px;
+  text-align: center;
+}
+
+.learn-toggle {
+  font-size: 1rem;
+}
+
+.learn-panel {
+  margin: 16px auto 0;
+  max-width: 760px;
+  text-align: left;
+}
+
+.learn-list {
+  margin: 0;
+  padding-left: 22px;
+  color: var(--text);
+  line-height: 1.7;
 }
 
 .join-inline {
