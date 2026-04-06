@@ -54,7 +54,7 @@ p {
 }
 
 h1 {
-  font-size: clamp(3.75rem, 7.5vw, 6rem);
+  font-size: clamp(2.5rem, 5vw, 4rem);
   line-height: 0.95;
 }
 
@@ -119,8 +119,8 @@ h1 {
 }
 
 .dashboard-grid {
-  grid-template-columns: 1.05fr 1fr;
-  gap: 110px;
+  grid-template-columns: 3fr 3fr;
+  column-gap: min(14vw, 160px);
 }
 
 .lobby-actions-row {
@@ -203,7 +203,7 @@ button:disabled {
   background: transparent;
   color: var(--text);
   min-width: 280px;
-  font-size: 1.1rem;
+  font-size: 0.9625rem;
   font-weight: 700;
   font-style: italic;
   text-transform: uppercase;
