@@ -31,6 +31,13 @@ body {
   margin-bottom: 20px;
 }
 
+.hero-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
 .mini-label,
 .hint,
 .room-meta,
@@ -162,7 +169,7 @@ button {
   color: var(--text);
 }
 
-button:hover {
+.text-button:hover {
   opacity: 0.9;
 }
 
@@ -171,13 +178,23 @@ button:disabled {
   cursor: not-allowed;
 }
 
-.primary,
-.secondary,
-.ghost,
+.text-button,
 .room-open-btn,
 .room-close-btn {
   background: transparent;
   color: var(--text);
+}
+
+.action-button {
+  border: 1px solid var(--line);
+  padding: 12px 16px;
+  background: transparent;
+  color: var(--text);
+}
+
+.action-button:hover {
+  border-color: #ffffff;
+  opacity: 1;
 }
 
 .auth-actions {
@@ -203,9 +220,21 @@ button:disabled {
   gap: 4px;
 }
 
+.hero-account {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  text-align: right;
+  align-self: center;
+}
+
 .hero-nav {
   padding-top: 10px;
   padding-bottom: 10px;
+  border: none;
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .account-chip {
@@ -266,6 +295,10 @@ button:disabled {
 
 .rooms-list {
   margin-top: 18px;
+}
+
+.rooms-list {
+  gap: 18px;
 }
 
 .secret-reminder {
@@ -353,6 +386,11 @@ button:disabled {
     padding-top: 24px;
   }
 
+  .hero-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .auth-grid,
   .join-strip,
   .topbar-group,
@@ -376,6 +414,11 @@ button:disabled {
   }
 
   .account-chip {
+    justify-items: start;
+    text-align: left;
+  }
+
+  .hero-account {
     justify-items: start;
     text-align: left;
   }

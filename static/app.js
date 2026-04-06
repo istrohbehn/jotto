@@ -12,18 +12,19 @@ const els = {
   authPanel: document.getElementById("authPanel"),
   dashboard: document.getElementById("dashboard"),
   heroNavBar: document.getElementById("heroNavBar"),
+  heroAccountBar: document.getElementById("heroAccountBar"),
   lobbyView: document.getElementById("lobbyView"),
   gameView: document.getElementById("gameView"),
   usernameInput: document.getElementById("usernameInput"),
   passwordInput: document.getElementById("passwordInput"),
   signupBtn: document.getElementById("signupBtn"),
   loginBtn: document.getElementById("loginBtn"),
-  meLabel: document.getElementById("meLabel"),
+  heroMeLabel: document.getElementById("heroMeLabel"),
   gameMeLabel: document.getElementById("gameMeLabel"),
   navLobbyBtn: document.getElementById("navLobbyBtn"),
   createPrivateBtn: document.getElementById("createPrivateBtn"),
   findMatchBtn: document.getElementById("findMatchBtn"),
-  logoutBtn: document.getElementById("logoutBtn"),
+  heroLogoutBtn: document.getElementById("heroLogoutBtn"),
   gameLogoutBtn: document.getElementById("gameLogoutBtn"),
   joinCodeInput: document.getElementById("joinCodeInput"),
   joinCodeBtn: document.getElementById("joinCodeBtn"),
@@ -97,7 +98,7 @@ function setBusy(isBusy) {
     els.navLobbyBtn,
     els.createPrivateBtn,
     els.findMatchBtn,
-    els.logoutBtn,
+    els.heroLogoutBtn,
     els.gameLogoutBtn,
     els.joinCodeBtn,
     els.joinInviteBtn,
@@ -416,12 +417,14 @@ function render() {
 
   if (!user) {
     els.heroNavBar.classList.add("hidden");
+    els.heroAccountBar.classList.add("hidden");
     renderInvite(data.invite, user);
     renderViews(null, null);
     return;
   }
 
-  els.meLabel.textContent = user.username;
+  els.heroAccountBar.classList.toggle("hidden", state.currentView === "game");
+  els.heroMeLabel.textContent = user.username;
   els.gameMeLabel.textContent = user.username;
   els.winsLabel.textContent = String(lobby?.stats?.wins || 0);
   els.lossesLabel.textContent = String(lobby?.stats?.losses || 0);
@@ -618,7 +621,7 @@ function bindEvents() {
   els.navLobbyBtn.addEventListener("click", goToLobby);
   els.createPrivateBtn.addEventListener("click", createPrivateRoom);
   els.findMatchBtn.addEventListener("click", findMatch);
-  els.logoutBtn.addEventListener("click", logout);
+  els.heroLogoutBtn.addEventListener("click", logout);
   els.gameLogoutBtn.addEventListener("click", logout);
   els.joinCodeBtn.addEventListener("click", () => joinRoom(els.joinCodeInput.value));
   els.joinInviteBtn.addEventListener("click", () => joinRoom(state.roomCode));
