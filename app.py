@@ -170,11 +170,17 @@ class GameStore:
                     round_number INTEGER NOT NULL,
                     winner_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
                     winning_word TEXT NOT NULL,
+                    losing_word TEXT,
                     finished_at REAL NOT NULL,
                     PRIMARY KEY (room_id, round_number)
                 );
                 """
             )
+            round_result_columns = {
+                row["name"] for row in conn.execute("PRAGMA table_info(round_results)").fetchall()
+            }
+            if "losing_word" not in round_result_columns:
+                conn.execute("ALTER TABLE round_results ADD COLUMN losing_word TEXT")
 
     def create_user(self, username: str, password: str) -> tuple[Optional[dict], str]:
         username = username.strip()
@@ -446,6 +452,8 @@ class GameStore:
 
             if guess_word == opponent["secret_word"]:
                 finished_at = now_ts()
+                winner_secret = next(player["secret_word"] for player in players if player["user_id"] == user_id)
+                losing_word = opponent["secret_word"]
                 conn.execute(
                     """
                     UPDATE rooms
@@ -456,16 +464,16 @@ class GameStore:
                         updated_at = ?
                     WHERE id = ?
                     """,
-                    (user_id, guess_word, finished_at, room["id"]),
+                    (user_id, winner_secret, finished_at, room["id"]),
                 )
                 conn.execute(
                     """
                     INSERT OR REPLACE INTO round_results (
-                        room_id, round_number, winner_user_id, winning_word, finished_at
+                        room_id, round_number, winner_user_id, winning_word, losing_word, finished_at
                     )
-                    VALUES (?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?)
                     """,
-                    (room["id"], room["round_number"], user_id, guess_word, finished_at),
+                    (room["id"], room["round_number"], user_id, winner_secret, losing_word, finished_at),
                 )
             else:
                 conn.execute(
@@ -796,7 +804,8 @@ class GameStore:
                 all_rounds.round_number,
                 COALESCE(guess_counts.guess_count, 0) AS guess_count,
                 users.username AS winner_name,
-                round_results.winning_word
+                round_results.winning_word,
+                round_results.losing_word
             FROM (
                 SELECT DISTINCT round_number
                 FROM guesses
@@ -870,6 +879,7 @@ class GameStore:
                     "guess_count": entry["guess_count"],
                     "winner_name": entry["winner_name"],
                     "winning_word": entry["winning_word"],
+                    "losing_word": entry["losing_word"],
                 }
                 for entry in round_history
             ],

@@ -303,6 +303,11 @@ button:disabled {
   font-style: italic;
 }
 
+.duel-heading {
+  justify-items: center;
+  text-align: center;
+}
+
 .header-status-row {
   display: flex;
   justify-content: space-between;
@@ -447,6 +452,7 @@ button:disabled {
 .guess-column h4 {
   font-size: 1rem;
   color: var(--muted);
+  margin-bottom: 12px;
 }
 
 .guess-entry {

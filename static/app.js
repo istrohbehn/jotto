@@ -281,10 +281,14 @@ function renderHistory(rounds) {
     const winningWordLine = round.winning_word
       ? `<p>Winning word: ${round.winning_word.toUpperCase()}</p>`
       : "";
+    const losingWordLine = round.losing_word
+      ? `<p>Losing word: ${round.losing_word.toUpperCase()}</p>`
+      : "";
     card.innerHTML = `
       <strong>Round ${round.round_number}</strong>
       <p>${round.winner_name ? `${round.winner_name} won` : "In progress"} with ${round.guess_count} total guesses logged.</p>
       ${winningWordLine}
+      ${losingWordLine}
     `;
     els.historyList.appendChild(card);
   }
