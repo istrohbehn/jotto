@@ -225,9 +225,6 @@ function renderRooms(rooms) {
         <p>${room.status}</p>
       </div>
       <div class="room-card-actions">
-        <div class="room-meta">
-          <span>Game ${room.round_number}</span>
-        </div>
         <button class="ghost room-open-btn" type="button">Open</button>
         <button class="ghost room-close-btn" type="button">Close</button>
       </div>

@@ -197,12 +197,15 @@ button:disabled {
 }
 
 .action-button {
-  border: 1px solid var(--line);
+  border: 1px solid #ffffff;
   padding: 20px 30px;
   background: transparent;
   color: var(--text);
   min-width: 280px;
   font-size: 1.1rem;
+  font-weight: 700;
+  font-style: italic;
+  text-transform: uppercase;
 }
 
 .action-button:hover {
@@ -239,6 +242,13 @@ button:disabled {
   gap: 4px;
   text-align: right;
   align-self: center;
+}
+
+#lobbyView > .dashboard-grid > .panel {
+  border: none;
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .hero-nav {
@@ -333,6 +343,7 @@ button:disabled {
 
 .section-heading h3 {
   font-size: 1.75rem;
+  font-style: italic;
 }
 
 .join-code-btn {
