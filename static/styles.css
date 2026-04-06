@@ -223,6 +223,12 @@ button:disabled {
   color: var(--text);
 }
 
+.invite-link-button {
+  border: 1px solid #ffffff;
+  padding: 10px 16px;
+  border-radius: 12px;
+}
+
 .action-button {
   border: 1px solid #ffffff;
   padding: 20px 30px;
@@ -289,6 +295,12 @@ button:disabled {
 
 .header-status {
   min-width: 220px;
+}
+
+.duel-heading h2,
+.game-section-title {
+  font-size: 1.75rem;
+  font-style: italic;
 }
 
 .header-status-row {
@@ -402,6 +414,10 @@ button:disabled {
   margin-top: 6px;
   letter-spacing: 0.08em;
   font-size: 1.35rem;
+}
+
+.secret-reminder span {
+  display: inline-block;
 }
 
 .alphabet-tracker {

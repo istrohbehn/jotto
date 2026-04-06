@@ -136,7 +136,7 @@
             </div>
 
             <div class="header-actions">
-              <button id="copyLinkBtn" class="text-button" type="button">Copy Invite Link</button>
+              <button id="copyLinkBtn" class="text-button invite-link-button" type="button">Copy Invite Link</button>
               <button id="reopenBtn" class="text-button hidden" type="button">Reopen Game</button>
               <button id="restartBtn" class="text-button hidden" type="button">Start New Round</button>
             </div>
@@ -145,7 +145,7 @@
           <section id="gamePanel" class="game-panel">
             <div class="board">
               <section class="panel">
-                <h3>Secret Word</h3>
+                <h3 class="game-section-title">Your Secret Word</h3>
                 <div id="secretEntryBox" class="stack">
                   <label class="field">
                     <span>Choose a 5-letter isogram</span>
@@ -173,7 +173,7 @@
 
             <section class="panel">
               <div class="section-heading">
-                <h3>Alphabet Tracker</h3>
+                <h3 class="game-section-title">Alphabet Tracker</h3>
                 <button id="clearAlphabetBtn" class="text-button" type="button">Clear Marks</button>
               </div>
               <p class="hint">Click once to circle a letter, click again to cross it off, click a third time to clear it.</p>
@@ -182,7 +182,7 @@
 
             <section class="panel">
               <div class="section-heading">
-                <h3>Round Guess History</h3>
+                <h3 class="game-section-title">Guess History</h3>
               </div>
               <div id="guessesEmpty" class="empty-state">No guesses in this round yet.</div>
               <div id="guessesTable" class="guess-columns hidden">
@@ -199,7 +199,7 @@
 
             <section class="panel">
               <div class="section-heading">
-                <h3>Recent Rounds</h3>
+                <h3 class="game-section-title">Recent Rounds</h3>
               </div>
               <div id="historyEmpty" class="empty-state">Round history will appear after you finish a round.</div>
               <div id="historyList" class="history-list"></div>

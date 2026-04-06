@@ -278,12 +278,25 @@ function renderHistory(rounds) {
   for (const round of rounds) {
     const card = document.createElement("article");
     card.className = "history-card";
+    const winningWordLine = round.winning_word
+      ? `<p>Winning word: ${round.winning_word.toUpperCase()}</p>`
+      : "";
     card.innerHTML = `
       <strong>Round ${round.round_number}</strong>
-      <p>${round.winner_name ? `${round.winner_name} finished it` : "In progress"} with ${round.guess_count} total guesses logged.</p>
+      <p>${round.winner_name ? `${round.winner_name} won` : "In progress"} with ${round.guess_count} total guesses logged.</p>
+      ${winningWordLine}
     `;
     els.historyList.appendChild(card);
   }
+}
+
+function renderRainbowWord(word) {
+  const palette = ["brand-j", "brand-o1", "brand-t1", "brand-t2", "brand-o2"];
+  return word
+    .toUpperCase()
+    .split("")
+    .map((letter, index) => `<span class="${palette[index % palette.length]}">${letter}</span>`)
+    .join("");
 }
 
 function renderInvite(invite, user) {
@@ -355,7 +368,7 @@ function renderRoom(room) {
   els.duelNames.textContent = `${playerOneName} vs. ${playerTwoName}`;
   els.roomCodeLabel.textContent = `Room ${room.room_code}`;
   els.gameNumberText.textContent = String(room.round_number);
-  els.secretWordDisplay.textContent = room.my_secret_word ? room.my_secret_word.toUpperCase() : "Not set";
+  els.secretWordDisplay.innerHTML = room.my_secret_word ? renderRainbowWord(room.my_secret_word) : "Not set";
 
   if (playerOneWins === playerTwoWins) {
     els.recordSummary.textContent = `Record: tied at ${playerOneWins}-${playerTwoWins}`;
@@ -380,8 +393,9 @@ function renderRoom(room) {
   els.secretEntryBox.classList.toggle("hidden", room.my_secret_set);
   els.secretInput.disabled = room.my_secret_set;
   els.secretBtn.disabled = room.my_secret_set;
+  els.secretHint.classList.toggle("hidden", room.my_secret_set);
   els.secretHint.textContent = room.my_secret_set
-    ? "Your secret is locked in for this game."
+    ? ""
     : "No repeated letters. Your secret stays hidden from the other player.";
   els.guessInput.disabled = !(room.status === "playing" && room.is_your_turn);
   els.guessBtn.disabled = !(room.status === "playing" && room.is_your_turn);

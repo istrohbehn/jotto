@@ -795,7 +795,8 @@ class GameStore:
             SELECT
                 all_rounds.round_number,
                 COALESCE(guess_counts.guess_count, 0) AS guess_count,
-                users.username AS winner_name
+                users.username AS winner_name,
+                round_results.winning_word
             FROM (
                 SELECT DISTINCT round_number
                 FROM guesses
@@ -868,6 +869,7 @@ class GameStore:
                     "round_number": entry["round_number"],
                     "guess_count": entry["guess_count"],
                     "winner_name": entry["winner_name"],
+                    "winning_word": entry["winning_word"],
                 }
                 for entry in round_history
             ],
