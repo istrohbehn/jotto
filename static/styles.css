@@ -130,6 +130,16 @@ h1 {
   margin: 8px 0 22px;
 }
 
+.join-by-code {
+  margin-top: 22px;
+}
+
+.join-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .field {
   display: grid;
   gap: 8px;
@@ -188,9 +198,11 @@ button:disabled {
 
 .action-button {
   border: 1px solid var(--line);
-  padding: 12px 16px;
+  padding: 20px 30px;
   background: transparent;
   color: var(--text);
+  min-width: 280px;
+  font-size: 1.1rem;
 }
 
 .action-button:hover {
@@ -283,6 +295,9 @@ button:disabled {
 
 .room-card {
   text-align: left;
+  border: none;
+  background: transparent;
+  padding: 0;
 }
 
 .room-card p,
@@ -310,6 +325,19 @@ button:disabled {
 
 .rooms-list {
   gap: 18px;
+}
+
+.section-heading {
+  margin-bottom: 18px;
+}
+
+.section-heading h3 {
+  font-size: 1.75rem;
+}
+
+.join-code-btn {
+  padding: 13px 0;
+  min-width: 72px;
 }
 
 .secret-reminder {
@@ -428,6 +456,11 @@ button:disabled {
     align-items: stretch;
   }
 
+  .join-inline {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
   .account-chip {
     justify-items: start;
     text-align: left;
@@ -444,5 +477,10 @@ button:disabled {
 
   .alphabet-tracker {
     grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .action-button {
+    min-width: 0;
+    width: 100%;
   }
 }

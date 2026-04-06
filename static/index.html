@@ -65,15 +65,17 @@
               <div class="section-heading">
                 <h3>Open Games</h3>
               </div>
-              <div class="join-strip">
-                <label class="field grow">
-                  <span>Join by room code</span>
-                  <input id="joinCodeInput" maxlength="6" placeholder="ABC123" />
-                </label>
-                <button id="joinCodeBtn" class="secondary align-end">Join</button>
-              </div>
               <div id="roomsEmpty" class="empty-state">Your open games will show up here after you play.</div>
               <div id="roomsList" class="rooms-list"></div>
+              <div class="join-by-code">
+                <label class="field join-code-field">
+                  <span>Join by room code</span>
+                  <div class="join-inline">
+                    <input id="joinCodeInput" maxlength="6" placeholder="ABC123" />
+                    <button id="joinCodeBtn" class="text-button join-code-btn" type="button">Join</button>
+                  </div>
+                </label>
+              </div>
             </section>
 
             <section class="panel">
