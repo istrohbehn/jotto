@@ -318,12 +318,18 @@ button:disabled {
 .header-status {
   grid-column: 1;
   justify-self: start;
+  padding-top: 2.25rem;
 }
 
 .header-actions {
   grid-column: 3;
   justify-self: end;
   justify-items: end;
+  align-self: start;
+  display: grid;
+  grid-template-rows: auto auto;
+  row-gap: 4px;
+  padding-top: 2.25rem;
 }
 
 .header-status-row {
@@ -337,6 +343,17 @@ button:disabled {
   font-size: 0.95rem;
   font-weight: 600;
   text-align: right;
+}
+
+.header-secondary-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  min-height: 1.25rem;
+}
+
+.status-your-turn {
+  font-style: italic;
 }
 
 .stat-card,
@@ -429,11 +446,18 @@ button:disabled {
 }
 
 .guess-stack {
-  gap: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.guess-field {
+  flex: 1;
 }
 
 #guessBtn {
-  justify-self: start;
+  flex: 0 0 auto;
 }
 
 .secret-reminder {
@@ -561,6 +585,17 @@ button:disabled {
   .join-inline {
     flex-direction: row;
     align-items: stretch;
+  }
+
+  .guess-stack,
+  .header-secondary-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-status,
+  .header-actions {
+    padding-top: 0;
   }
 
   .account-chip {

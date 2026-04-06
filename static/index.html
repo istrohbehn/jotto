@@ -137,8 +137,10 @@
 
             <div class="header-actions">
               <button id="copyLinkBtn" class="text-button invite-link-button" type="button">Copy Invite Link</button>
-              <button id="reopenBtn" class="text-button hidden" type="button">Reopen Game</button>
-              <button id="restartBtn" class="text-button hidden" type="button">Start New Round</button>
+              <div class="header-secondary-actions">
+                <button id="reopenBtn" class="text-button hidden" type="button">Reopen Game</button>
+                <button id="restartBtn" class="text-button hidden" type="button">Start New Round</button>
+              </div>
             </div>
           </section>
 
@@ -161,8 +163,8 @@
 
               <section class="panel">
                 <h3 class="game-section-title">Guess</h3>
-                <div class="stack guess-stack">
-                  <label class="field">
+                <div class="guess-stack">
+                  <label class="field guess-field">
                     <input id="guessInput" maxlength="5" placeholder="flags" />
                   </label>
                   <button id="guessBtn" class="text-button invite-link-button" type="button">Submit</button>

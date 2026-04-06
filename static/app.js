@@ -383,10 +383,16 @@ function renderRoom(room) {
   }
 
   let statusMessage = "Waiting for a second player.";
+  let emphasizeTurn = false;
   if (room.status === "setup") {
     statusMessage = room.my_secret_set ? "Waiting for the other player to lock in a word." : "Choose your secret word.";
   } else if (room.status === "playing") {
-    statusMessage = room.is_your_turn ? "Your turn to guess." : `${room.current_turn_name || "Opponent"} is up.`;
+    if (room.is_your_turn) {
+      statusMessage = "YOUR TURN TO GUESS";
+      emphasizeTurn = true;
+    } else {
+      statusMessage = `${room.current_turn_name || "Opponent"} is up.`;
+    }
   } else if (room.status === "finished") {
     statusMessage = buildFinishedMessage(room);
   } else if (room.status === "closed") {
@@ -394,6 +400,7 @@ function renderRoom(room) {
   }
 
   els.statusText.textContent = statusMessage;
+  els.statusText.classList.toggle("status-your-turn", emphasizeTurn);
   els.secretEntryBox.classList.toggle("hidden", room.my_secret_set);
   els.secretInput.disabled = room.my_secret_set;
   els.secretBtn.disabled = room.my_secret_set;
