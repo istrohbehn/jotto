@@ -3,7 +3,7 @@ const params = new URLSearchParams(window.location.search);
 const state = {
   bootstrap: null,
   roomCode: params.get("room")?.toUpperCase() || "",
-  currentView: params.get("view") === "game" ? "game" : "lobby",
+  currentView: params.get("view") === "game" ? "game" : params.get("view") === "notifications" ? "notifications" : "lobby",
   pollHandle: null,
   alphabetMarks: {},
   phoneDraft: "",
@@ -18,6 +18,7 @@ const els = {
   learnPanel: document.getElementById("learnPanel"),
   lobbyView: document.getElementById("lobbyView"),
   gameView: document.getElementById("gameView"),
+  notificationsView: document.getElementById("notificationsView"),
   usernameInput: document.getElementById("usernameInput"),
   passwordInput: document.getElementById("passwordInput"),
   signupBtn: document.getElementById("signupBtn"),
@@ -26,6 +27,7 @@ const els = {
   createPrivateBtn: document.getElementById("createPrivateBtn"),
   findMatchBtn: document.getElementById("findMatchBtn"),
   heroLogoutBtn: document.getElementById("heroLogoutBtn"),
+  heroNotificationsBtn: document.getElementById("heroNotificationsBtn"),
   joinCodeInput: document.getElementById("joinCodeInput"),
   joinCodeBtn: document.getElementById("joinCodeBtn"),
   winsLabel: document.getElementById("winsLabel"),
@@ -133,6 +135,8 @@ function syncUrl() {
   }
   if (state.currentView === "game" && state.roomCode) {
     url.searchParams.set("view", "game");
+  } else if (state.currentView === "notifications") {
+    url.searchParams.set("view", "notifications");
   } else {
     url.searchParams.delete("view");
   }
@@ -166,6 +170,12 @@ function saveAlphabetMarks() {
 
 function goToLobby() {
   state.currentView = "lobby";
+  syncUrl();
+  render();
+}
+
+function goToNotifications() {
+  state.currentView = "notifications";
   syncUrl();
   render();
 }
@@ -450,8 +460,10 @@ function renderRoom(room) {
 
 function renderViews(user, room) {
   const showGame = Boolean(user && state.currentView === "game" && state.roomCode);
-  els.lobbyView.classList.toggle("hidden", showGame);
+  const showNotifications = Boolean(user && state.currentView === "notifications");
+  els.lobbyView.classList.toggle("hidden", showGame || showNotifications);
   els.gameView.classList.toggle("hidden", !showGame);
+  els.notificationsView.classList.toggle("hidden", !showNotifications);
 
   if (showGame && !room) {
     els.gamePanel.classList.add("hidden");
@@ -729,6 +741,7 @@ function bindEvents() {
   els.createPrivateBtn.addEventListener("click", createPrivateRoom);
   els.findMatchBtn.addEventListener("click", findMatch);
   els.heroLogoutBtn.addEventListener("click", logout);
+  els.heroNotificationsBtn.addEventListener("click", goToNotifications);
   els.phoneInput.addEventListener("input", (event) => {
     state.phoneDraft = event.target.value;
   });

@@ -20,6 +20,7 @@
           <span class="mini-label">Signed In</span>
           <strong id="heroMeLabel">Player</strong>
           <button id="heroLogoutBtn" class="text-button" type="button">Log Out</button>
+          <button id="heroNotificationsBtn" class="text-button" type="button">Notification Settings</button>
         </div>
       </section>
 
@@ -97,26 +98,6 @@
                   <span class="mini-label">Waiting Public Rooms</span>
                   <strong id="waitingPublicLabel">0</strong>
                 </article>
-              </div>
-              <div class="sms-settings">
-                <h4 class="sms-heading">Turn Text Alerts</h4>
-                <p id="smsConfigHint" class="hint hidden">Text alerts are not configured on this server yet.</p>
-                <label class="field">
-                  <span>Phone number (E.164 format)</span>
-                  <input id="phoneInput" placeholder="+15551234567" />
-                </label>
-                <div class="sms-actions">
-                  <button id="savePhoneBtn" class="text-button invite-link-button" type="button">Save Number</button>
-                  <button id="sendCodeBtn" class="text-button" type="button">Send Code</button>
-                </div>
-                <div class="sms-verify-row">
-                  <label class="field sms-code-field">
-                    <span>Verification code</span>
-                    <input id="verifyCodeInput" inputmode="numeric" maxlength="10" placeholder="123456" />
-                  </label>
-                  <button id="verifyCodeBtn" class="text-button invite-link-button" type="button">Verify</button>
-                </div>
-                <p id="phoneStatusText" class="hint"></p>
               </div>
             </section>
           </div>
@@ -224,6 +205,34 @@
               <div id="historyEmpty" class="empty-state">Round history will appear after you finish a round.</div>
               <div id="historyList" class="history-list"></div>
             </section>
+          </section>
+        </section>
+
+        <section id="notificationsView" class="view hidden">
+          <section class="panel notifications-page">
+            <div class="section-heading">
+              <h3>Notification Settings</h3>
+            </div>
+            <div class="sms-settings">
+              <h4 class="sms-heading">Turn Text Alerts</h4>
+              <p id="smsConfigHint" class="hint hidden">Text alerts are not configured on this server yet.</p>
+              <label class="field">
+                <span>Phone number (E.164 format)</span>
+                <input id="phoneInput" placeholder="+15551234567" />
+              </label>
+              <div class="sms-actions">
+                <button id="savePhoneBtn" class="text-button invite-link-button" type="button">Save Number</button>
+                <button id="sendCodeBtn" class="text-button" type="button">Send Code</button>
+              </div>
+              <div class="sms-verify-row">
+                <label class="field sms-code-field">
+                  <span>Verification code</span>
+                  <input id="verifyCodeInput" inputmode="numeric" maxlength="10" placeholder="123456" />
+                </label>
+                <button id="verifyCodeBtn" class="text-button invite-link-button" type="button">Verify</button>
+              </div>
+              <p id="phoneStatusText" class="hint"></p>
+            </div>
           </section>
         </section>
       </section>

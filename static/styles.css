@@ -145,6 +145,10 @@ h1 {
   gap: 14px;
 }
 
+.notifications-page {
+  max-width: 640px;
+}
+
 .sms-heading {
   font-size: 1.1rem;
   font-style: italic;
