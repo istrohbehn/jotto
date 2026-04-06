@@ -120,6 +120,7 @@ h1 {
 
 .dashboard-grid {
   grid-template-columns: 1.05fr 1fr;
+  gap: 64px;
 }
 
 .lobby-actions-row {
@@ -308,6 +309,18 @@ button:disabled {
   border: none;
   background: transparent;
   padding: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.room-link {
+  display: grid;
+  gap: 4px;
+  text-align: left;
+  padding: 0;
+  flex: 1;
 }
 
 .room-card p,
@@ -335,6 +348,14 @@ button:disabled {
 
 .rooms-list {
   gap: 18px;
+}
+
+.room-close-btn {
+  color: #ef4444;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0;
 }
 
 .section-heading {

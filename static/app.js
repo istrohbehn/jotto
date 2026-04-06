@@ -220,20 +220,23 @@ function renderRooms(rooms) {
     card.className = "room-card";
     const label = room.opponent_name ? `Private game vs. ${room.opponent_name}` : "Private game";
     card.innerHTML = `
-      <div>
+      <button class="room-link" type="button">
         <strong>${label}</strong>
         <p>${room.status}</p>
-      </div>
+      </button>
       <div class="room-card-actions">
-        <button class="ghost room-open-btn" type="button">Open</button>
-        <button class="ghost room-close-btn" type="button">Close</button>
+        <button class="ghost room-close-btn" type="button" aria-label="Close game">x</button>
       </div>
     `;
-    card.querySelector(".room-open-btn").addEventListener("click", async () => {
+    card.querySelector(".room-link").addEventListener("click", async () => {
       goToGame(room.room_code);
       await refresh();
     });
     card.querySelector(".room-close-btn").addEventListener("click", async () => {
+      const confirmed = window.confirm(`Are you sure you want to close ${label}?`);
+      if (!confirmed) {
+        return;
+      }
       await closeRoom(room.room_code);
     });
     els.roomsList.appendChild(card);
