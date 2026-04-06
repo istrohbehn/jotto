@@ -305,13 +305,13 @@ button:disabled {
 
 .auth-actions {
   margin-top: 18px;
+  justify-items: center;
 }
 
 .auth-button {
   border: 1px solid #ffffff;
   padding: 10px 14px;
   width: auto;
-  justify-self: start;
 }
 
 .invite-copy,
