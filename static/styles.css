@@ -202,7 +202,8 @@ h1 {
 }
 
 .learn-toggle {
-  font-size: 1rem;
+  font-size: 1.5rem;
+  font-style: italic;
 }
 
 .learn-panel {
@@ -294,7 +295,6 @@ button:disabled {
   min-width: 280px;
   font-size: 0.9625rem;
   font-weight: 700;
-  font-style: italic;
   text-transform: uppercase;
 }
 
