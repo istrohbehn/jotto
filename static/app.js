@@ -38,6 +38,9 @@ const els = {
   inviteText: document.getElementById("inviteText"),
   joinInviteBtn: document.getElementById("joinInviteBtn"),
   gamePanel: document.getElementById("gamePanel"),
+  boardLayout: document.getElementById("boardLayout"),
+  secretPanel: document.getElementById("secretPanel"),
+  guessSection: document.getElementById("guessSection"),
   duelNames: document.getElementById("duelNames"),
   roomCodeLabel: document.getElementById("roomCodeLabel"),
   recordSummary: document.getElementById("recordSummary"),
@@ -50,7 +53,6 @@ const els = {
   secretInput: document.getElementById("secretInput"),
   secretBtn: document.getElementById("secretBtn"),
   secretWordDisplay: document.getElementById("secretWordDisplay"),
-  secretHint: document.getElementById("secretHint"),
   guessInput: document.getElementById("guessInput"),
   guessBtn: document.getElementById("guessBtn"),
   alphabetTracker: document.getElementById("alphabetTracker"),
@@ -372,7 +374,7 @@ function renderRoom(room) {
   els.duelNames.textContent = `${playerOneName} vs. ${playerTwoName}`;
   els.roomCodeLabel.textContent = `Room ${room.room_code}`;
   els.gameNumberText.textContent = String(room.round_number);
-  els.secretWordDisplay.innerHTML = room.my_secret_word ? renderRainbowWord(room.my_secret_word) : "Not set";
+  els.secretWordDisplay.innerHTML = room.my_secret_word ? renderRainbowWord(room.my_secret_word) : "";
 
   if (playerOneWins === playerTwoWins) {
     els.recordSummary.textContent = `Record: tied at ${playerOneWins}-${playerTwoWins}`;
@@ -401,13 +403,12 @@ function renderRoom(room) {
 
   els.statusText.textContent = statusMessage;
   els.statusText.classList.toggle("status-your-turn", emphasizeTurn);
+  els.boardLayout.classList.toggle("setup-mode", !room.my_secret_set);
+  els.guessSection.classList.toggle("hidden", !room.my_secret_set);
   els.secretEntryBox.classList.toggle("hidden", room.my_secret_set);
   els.secretInput.disabled = room.my_secret_set;
   els.secretBtn.disabled = room.my_secret_set;
-  els.secretHint.classList.toggle("hidden", room.my_secret_set);
-  els.secretHint.textContent = room.my_secret_set
-    ? ""
-    : "No repeated letters. Your secret stays hidden from the other player.";
+  els.secretWordDisplay.parentElement.classList.toggle("hidden", !room.my_secret_set);
   els.guessInput.disabled = !(room.status === "playing" && room.is_your_turn);
   els.guessBtn.disabled = !(room.status === "playing" && room.is_your_turn);
   els.reopenBtn.classList.toggle("hidden", room.status !== "closed");

@@ -475,6 +475,17 @@ button:disabled {
   display: inline-block;
 }
 
+.board.setup-mode {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.board.setup-mode #secretPanel {
+  max-width: 460px;
+  width: 100%;
+  justify-self: center;
+  text-align: center;
+}
+
 .alphabet-tracker {
   margin-top: 14px;
   display: grid;

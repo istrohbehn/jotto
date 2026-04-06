@@ -145,23 +145,22 @@
           </section>
 
           <section id="gamePanel" class="game-panel">
-            <div class="board">
-              <section class="panel">
+            <div id="boardLayout" class="board">
+              <section id="secretPanel" class="panel">
                 <h3 class="game-section-title">Your Secret Word</h3>
                 <div id="secretEntryBox" class="stack">
                   <label class="field">
                     <span>Choose a 5-letter isogram</span>
                     <input id="secretInput" maxlength="5" placeholder="black" />
                   </label>
-                  <button id="secretBtn" class="primary">Lock Secret</button>
+                  <button id="secretBtn" class="text-button invite-link-button" type="button">Lock Secret</button>
                 </div>
                 <div class="secret-reminder">
-                  <strong id="secretWordDisplay">Not set</strong>
+                  <strong id="secretWordDisplay"></strong>
                 </div>
-                <p id="secretHint" class="hint">No repeated letters. Your secret stays hidden from the other player.</p>
               </section>
 
-              <section class="panel">
+              <section id="guessSection" class="panel">
                 <h3 class="game-section-title">Guess</h3>
                 <div class="guess-stack">
                   <label class="field guess-field">
