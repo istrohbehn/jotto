@@ -32,7 +32,6 @@ const els = {
   lossesLabel: document.getElementById("lossesLabel"),
   finishedLabel: document.getElementById("finishedLabel"),
   waitingPublicLabel: document.getElementById("waitingPublicLabel"),
-  dictionaryCount: document.getElementById("dictionaryCount"),
   roomsEmpty: document.getElementById("roomsEmpty"),
   roomsList: document.getElementById("roomsList"),
   invitePanel: document.getElementById("invitePanel"),
@@ -413,7 +412,6 @@ function render() {
 
   els.authPanel.classList.toggle("hidden", Boolean(user));
   els.dashboard.classList.toggle("hidden", !user);
-  els.dictionaryCount.textContent = `${data.words_count || 0} playable words loaded`;
 
   if (!user) {
     els.heroNavBar.classList.add("hidden");

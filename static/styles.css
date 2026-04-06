@@ -90,7 +90,6 @@ h1 {
 .auth-panel,
 #invitePanel,
 .hero-nav,
-.topbar-group,
 .game-page-header,
 .dashboard-grid,
 .game-panel {
@@ -101,7 +100,6 @@ h1 {
 .actions,
 .header-actions,
 .join-strip,
-.topbar-group,
 .stats-grid,
 .dashboard-grid,
 .board,
@@ -114,7 +112,6 @@ h1 {
 
 .auth-grid,
 .join-strip,
-.topbar-group,
 .stats-grid,
 .guess-columns,
 .board {
@@ -125,8 +122,12 @@ h1 {
   grid-template-columns: 1.05fr 1fr;
 }
 
-.join-strip-spaced {
-  margin-top: 20px;
+.lobby-actions-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 26px;
+  margin: 8px 0 22px;
 }
 
 .field {
@@ -264,6 +265,16 @@ button:disabled {
   padding: 16px;
 }
 
+.stat-card-plain {
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+.stats-grid-plain {
+  gap: 24px 18px;
+}
+
 .stat-card strong {
   display: block;
   margin-top: 8px;
@@ -371,7 +382,6 @@ button:disabled {
 
 @media (max-width: 900px) {
   .dashboard-grid,
-  .topbar-group,
   .stats-grid,
   .guess-columns,
   .board,
@@ -393,7 +403,6 @@ button:disabled {
 
   .auth-grid,
   .join-strip,
-  .topbar-group,
   .dashboard-grid,
   .stats-grid,
   .guess-columns,
@@ -401,6 +410,12 @@ button:disabled {
   .header-actions,
   .actions {
     grid-template-columns: 1fr;
+  }
+
+  .lobby-actions-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
   }
 
   .invite-copy,

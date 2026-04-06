@@ -55,55 +55,49 @@
         </section>
 
         <section id="lobbyView" class="view">
-          <div class="topbar-group">
-            <section class="panel lobby-actions-panel">
-              <div id="lobbyActions" class="header-actions">
-                <button id="createPrivateBtn" class="action-button" type="button">Create Private Room</button>
-                <button id="findMatchBtn" class="action-button" type="button">Find Public Match</button>
-              </div>
-            </section>
+          <div class="lobby-actions-row">
+            <button id="createPrivateBtn" class="action-button" type="button">Create Private Room</button>
+            <button id="findMatchBtn" class="action-button" type="button">Find Public Match</button>
           </div>
 
           <div class="dashboard-grid">
             <section class="panel">
               <div class="section-heading">
-                <h3>Lobby</h3>
-                <p class="hint" id="dictionaryCount">0 playable words loaded</p>
+                <h3>Open Games</h3>
               </div>
-              <div class="stats-grid">
-                <article class="stat-card">
-                  <span class="mini-label">Wins</span>
-                  <strong id="winsLabel">0</strong>
-                </article>
-                <article class="stat-card">
-                  <span class="mini-label">Losses</span>
-                  <strong id="lossesLabel">0</strong>
-                </article>
-                <article class="stat-card">
-                  <span class="mini-label">Finished</span>
-                  <strong id="finishedLabel">0</strong>
-                </article>
-                <article class="stat-card">
-                  <span class="mini-label">Waiting Public Rooms</span>
-                  <strong id="waitingPublicLabel">0</strong>
-                </article>
-              </div>
-
-              <div class="join-strip join-strip-spaced">
+              <div class="join-strip">
                 <label class="field grow">
                   <span>Join by room code</span>
                   <input id="joinCodeInput" maxlength="6" placeholder="ABC123" />
                 </label>
                 <button id="joinCodeBtn" class="secondary align-end">Join</button>
               </div>
+              <div id="roomsEmpty" class="empty-state">Your open games will show up here after you play.</div>
+              <div id="roomsList" class="rooms-list"></div>
             </section>
 
             <section class="panel">
               <div class="section-heading">
-                <h3>Open Games</h3>
+                <h3>Stats</h3>
               </div>
-              <div id="roomsEmpty" class="empty-state">Your open games will show up here after you play.</div>
-              <div id="roomsList" class="rooms-list"></div>
+              <div class="stats-grid stats-grid-plain">
+                <article class="stat-card stat-card-plain">
+                  <span class="mini-label">Wins</span>
+                  <strong id="winsLabel">0</strong>
+                </article>
+                <article class="stat-card stat-card-plain">
+                  <span class="mini-label">Losses</span>
+                  <strong id="lossesLabel">0</strong>
+                </article>
+                <article class="stat-card stat-card-plain">
+                  <span class="mini-label">Finished</span>
+                  <strong id="finishedLabel">0</strong>
+                </article>
+                <article class="stat-card stat-card-plain">
+                  <span class="mini-label">Waiting Public Rooms</span>
+                  <strong id="waitingPublicLabel">0</strong>
+                </article>
+              </div>
             </section>
           </div>
         </section>
