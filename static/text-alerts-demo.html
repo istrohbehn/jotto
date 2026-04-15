@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jotto Text Alerts Demo</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell public-shell">
+      <section class="hero public-hero">
+        <div class="hero-brand">
+          <h1 class="brand-title" aria-label="Jotto">
+            <span class="brand-j">J</span><span class="brand-o1">o</span><span class="brand-t1">t</span><span class="brand-t2">t</span><span class="brand-o2">o</span>
+          </h1>
+          <p class="hero-subtitle">A word duel.</p>
+        </div>
+        <div class="public-links">
+          <a class="text-button public-link" href="/site">Public Site</a>
+          <a class="text-button public-link" href="/privacy">Privacy Policy</a>
+          <a class="text-button public-link" href="/terms">Terms of Service</a>
+          <a class="text-button invite-link-button" href="/">Play Jotto</a>
+        </div>
+      </section>
+
+      <section class="panel notifications-page notifications-page-plain">
+        <div class="sms-settings">
+          <h3 class="sms-heading">Text alerts</h3>
+          <p class="hint">Receive texts when it is your turn.</p>
+          <div class="sms-setup-form">
+            <label class="field">
+              <span>Phone number</span>
+              <input value="+15551234567" readonly />
+            </label>
+            <p class="hint sms-consent">
+              By entering your phone number and clicking "Send code to verify," you agree to receive automated text messages from Jotto for turn notifications. Message frequency varies. Message and data rates may apply. Consent is not required to use Jotto. Reply STOP to opt out and HELP for help. See our <a href="/privacy">Privacy Policy</a> and <a href="/terms">Terms of Service</a>.
+            </p>
+            <div class="sms-actions">
+              <button class="text-button invite-link-button" type="button">Send code to verify</button>
+            </div>
+          </div>
+          <div class="sms-verify-block">
+            <label class="field sms-code-field">
+              <span>Verification code</span>
+              <input value="123456" readonly />
+            </label>
+            <button class="text-button invite-link-button" type="button">Verify</button>
+          </div>
+          <div class="sms-verified-block">
+            <p>+15551234567 is <span class="verified-word">verified</span>.</p>
+            <button class="text-button invite-link-button remove-notifications-btn" type="button">Remove text notifications</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

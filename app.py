@@ -1178,6 +1178,9 @@ class JottoHandler(BaseHTTPRequestHandler):
         if parsed.path == "/site":
             self._serve_static("site.html", "text/html; charset=utf-8")
             return
+        if parsed.path == "/text-alerts-demo":
+            self._serve_static("text-alerts-demo.html", "text/html; charset=utf-8")
+            return
         if parsed.path == "/privacy":
             self._serve_static("privacy.html", "text/html; charset=utf-8")
             return
