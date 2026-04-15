@@ -27,6 +27,10 @@ body {
   padding: 40px 0 72px;
 }
 
+.public-shell {
+  padding-top: 48px;
+}
+
 .hero {
   margin-bottom: 20px;
 }
@@ -38,9 +42,25 @@ body {
   gap: 16px;
 }
 
+.public-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 34px;
+}
+
 .hero-brand {
   display: grid;
   gap: 8px;
+}
+
+.public-links {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .mini-label,
@@ -199,6 +219,48 @@ h1 {
 .learn-more {
   margin-top: 34px;
   text-align: center;
+}
+
+.public-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 48px;
+  margin-bottom: 34px;
+}
+
+.public-card-plain {
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+.public-title {
+  margin-top: 10px;
+  font-size: 2rem;
+  font-style: italic;
+}
+
+.public-copy {
+  margin-top: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  max-width: 65ch;
+}
+
+.public-list {
+  margin: 14px 0 0;
+  padding-left: 22px;
+  color: var(--text);
+  line-height: 1.8;
+}
+
+.public-section,
+.public-legal {
+  margin-top: 18px;
+}
+
+.public-link {
+  padding: 0;
 }
 
 .learn-toggle {
@@ -610,6 +672,7 @@ button:disabled {
 
 @media (max-width: 900px) {
   .dashboard-grid,
+  .public-grid,
   .stats-grid,
   .guess-columns,
   .board,
@@ -629,9 +692,15 @@ button:disabled {
     align-items: stretch;
   }
 
+  .public-hero {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .auth-grid,
   .join-strip,
   .dashboard-grid,
+  .public-grid,
   .stats-grid,
   .guess-columns,
   .board,
